@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS reconciliation.mock_discrepancies (
     gateway_outcome text NOT NULL,
     reason text NOT NULL,
     detected_at timestamptz NOT NULL DEFAULT now(),
-    observed_at timestamptz NOT NULL DEFAULT now()
+    observed_at timestamptz NOT NULL DEFAULT now(),
+    resolved_at timestamptz
 );
 COMMENT ON TABLE integration.mock_webhook_inbox IS
   'Verified demo HMAC callback receipts, deduped. Not a true PSP evidence store.';
