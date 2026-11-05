@@ -1,0 +1,14 @@
+Feature,Status,Automated_test,Known_gap,Next_step
+Payment Domain state transitions,Implemented,Unit tests PASSED (3),PSP finality unapproved,Review state machine
+POST /v1/payments,Implemented,DB test PASSED,Development-only demo identity,Add real AuthN
+GET /v1/payments/{id},Implemented,Tenant test PASSED,Development-only identity,Add real AuthZ
+PostgreSQL idempotency,Implemented,12-concurrent-create test designed,CI 9/9 PASSED,Inspect CI
+Payment + Attempt + Outbox atomic,Implemented,Outbox-count integration test designed,No RabbitMQ publisher,Implement publisher
+Mock PSP background worker,Implemented,Worker claim test PASSED,No real provider and inquiry,Add Mock Inquiry
+Unknown on expired worker lease,Implemented,No crash injection executed,No automated inquiry recovery,Implement recovery tests
+RabbitMQ publishing,Not Implemented,Not Run,Outbox messages remain in DB,Add publisher confirms
+PSP webhook signature,Not Implemented,Not Run,No external callbacks,Add provider-specific ACL
+RefundBudget,Not Implemented,Not Run,ADR-0013 still open,Finance decision
+Production authentication,Not Implemented,Not Run,Development-only header,Design merchant auth
+Production runtime decision,Proposed,Not applicable,.NET 10 requires architecture approval,ADR review
+Integration test evidence,Verified,3 unit + 6 PostgreSQL integration tests PASSED,Does not prove PSP side-effect correctness,https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/41969726629

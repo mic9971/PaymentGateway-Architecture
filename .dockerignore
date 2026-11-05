@@ -1,0 +1,13 @@
+.git/
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+**/.env
+**/.env.*
+!deploy/compose/.env.example
+**/*.pfx
+**/*.key
+**/*.p12
+*.xlsx
+*.zip
