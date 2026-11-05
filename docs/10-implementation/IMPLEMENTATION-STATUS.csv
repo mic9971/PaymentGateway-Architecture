@@ -1,0 +1,13 @@
+Feature,Status,Automated_test,Known_gap,Next_step
+Payment Domain state transitions,Implemented,Unit tests designed,PSP finality unapproved,Review state machine
+POST /v1/payments,Implemented,DB concurrency test designed,Development-only demo identity,Add real AuthN
+GET /v1/payments/{id},Implemented,Tenant isolation test designed,Development-only identity,Add real AuthZ
+PostgreSQL idempotency,Implemented,12-concurrent-create test designed,Test not verified from CI,Inspect CI
+Payment + Attempt + Outbox atomic,Implemented,Outbox-count integration test designed,No RabbitMQ publisher,Implement publisher
+Mock PSP background worker,Implemented,Worker claim test designed,No real provider and inquiry,Add Mock Inquiry
+Unknown on expired worker lease,Implemented,No crash injection executed,No automated inquiry recovery,Implement recovery tests
+RabbitMQ publishing,Not Implemented,Not Run,Outbox messages remain in DB,Add publisher confirms
+PSP webhook signature,Not Implemented,Not Run,No external callbacks,Add provider-specific ACL
+RefundBudget,Not Implemented,Not Run,ADR-0013 still open,Finance decision
+Production authentication,Not Implemented,Not Run,Development-only header,Design merchant auth
+Production runtime decision,Proposed,Not applicable,.NET 10 requires architecture approval,ADR review
