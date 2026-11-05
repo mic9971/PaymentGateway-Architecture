@@ -136,7 +136,7 @@ public sealed class RabbitMqOutboxInboxIntegrationTests
         var queue = "test.ack-lost." + Guid.NewGuid().ToString("N");
         var eventId = Guid.NewGuid();
         var consumerName = "test-audit-" + Guid.NewGuid().ToString("N");
-        var body = Encoding.UTF8.GetBytes("{\\"simulated\\":true,\\"kind\\":\\"redelivery\\"}");
+        var body = Encoding.UTF8.GetBytes("""{"simulated":true,"kind":"redelivery"}""");
         var inbox = new InboxProjectionStore(source);
 
         var firstChannel = await conn.CreateChannelAsync();
