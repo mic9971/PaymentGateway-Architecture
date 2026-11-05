@@ -1,0 +1,12 @@
+ID,From,To,Contract,Integration,Source_of_authority,Critical_risk,Status
+CM-01,Payment,Merchant,MerchantProfile,Sync query,Merchant,Tenant isolation,Proposed
+CM-02,Payment,Routing,SelectProvider,Sync policy,Routing,Unsafe PSP failover,Proposed
+CM-03,Payment,Provider Integration,ExecuteAttempt,Worker command,PSP contract,Duplicate charge,Needs Confirmation
+CM-04,Provider Integration,Payment,VerifiedProviderOutcome,Inbox/application,Payment state machine,Spoof/replay,Proposed
+CM-05,Refund,Payment,RefundableEvidence,Sync query/guard,Refund or Payment budget decision,Over-refund,Needs Confirmation
+CM-06,Refund,Provider Integration,ExecuteRefund,Worker command,PSP refund contract,Refund double-spend,Needs Confirmation
+CM-07,Reconciliation,Provider Integration,QueryStatus,Sync/batch,PSP/bank evidence,Unresolved unknown,Needs Confirmation
+CM-08,Reconciliation,Payment,ApplyVerifiedOutcome,Controlled command,Payment state writer,Unauthorized state override,Proposed
+CM-09,Payment,Notifications,PaymentStatusChanged,Outbox/RabbitMQ,Payment,Stale callbacks,Proposed
+CM-10,Refund,Notifications,RefundStatusChanged,Outbox/RabbitMQ,Refund,Duplicate callback,Proposed
+CM-11,All domain contexts,Audit & Operations,BusinessEvidenceRecorded,Append-only,Source domain,Sensitive audit leak,Needs Confirmation
