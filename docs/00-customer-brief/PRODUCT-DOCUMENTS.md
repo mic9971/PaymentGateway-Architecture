@@ -57,3 +57,10 @@ Do not modify old v0.1 files in place without explicit version-control intent. E
 - **Status:** Draft / pending customer, PSP, Finance, Legal, Security, SRE and architecture approvals.
 - Workbook is stored as original **.xlsx** on Google Drive. GitHub contains readable Markdown and CSV snapshots. GitHub CSV snapshots are *not* automatically synchronized to the workbook.
 - The previous 3 workbook files and Product Discovery v0.2 remain for historical comparison; do not overwrite them by assumption.
+
+## Current DDD Design Pack v1.1 (additional Day 2 depth)
+
+- **Editable Excel:** [PaymentGateway_E2E_Architecture_DDD_v1.1.xlsx](https://docs.google.com/spreadsheets/d/1WfbSCEKQRXnYwJvuz7XT4Q_gZ5v0QPwt/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true) — 51 sheets: all prior 42 E2E tabs retained, 9 new detailed DDD tabs. Original v1.0 stays available as historical baseline.
+- **GitHub:** [Strategic DDD documentation](../03-domain-design/README.md), [Context Map](../03-domain-design/02-context-map-and-contracts.md), [Refund ADR-0013](../04-solution-proposal/adrs/ADR-0013-refund-boundary-and-reservation.md).
+- **Status:** 8 BCs proposed, 14 DDD review gates open. Financial custody, PSP contracts and Refund consistency boundary remain **Needs Confirmation**.
+- Excel workbook is hosted on Drive and GitHub CSV/Markdown are review snapshots, not an automatic live sync.

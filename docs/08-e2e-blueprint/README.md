@@ -10,6 +10,10 @@
 
 This Excel workbook has **42 tabs**: the existing 15 Day-1 Product Discovery tabs preserved, plus 27 new end-to-end design, capacity, security, validation, governance and operations tabs. It is stored in Drive in **Excel format**, not converted to native Google Sheets. It is the detailed structured register; repository Markdown files are reviewable architectural explanations.
 
+## Current DDD v1.1 addendum
+
+**Detailed and most current domain model:** [Strategic DDD Design Pack](../03-domain-design/README.md). [Editable 51-sheet Excel DDD v1.1](https://docs.google.com/spreadsheets/d/1WfbSCEKQRXnYwJvuz7XT4Q_gZ5v0QPwt/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true) adds nine DDD tabs while preserving all 42 v1.0 tabs. This v1.0 blueprint is retained as the original baseline, not silently overwritten. See [ADR-0013](../04-solution-proposal/adrs/ADR-0013-refund-boundary-and-reservation.md) for the unresolved Refund transaction boundary.
+
 ## Reading order
 
 | Step | Document | Why |

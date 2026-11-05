@@ -1,5 +1,7 @@
 # 02 — Strategic DDD: Capabilities, Bounded Contexts and Ownership
 
+> **Baseline v1.0.** The latest detailed model is [DDD v1.1](../03-domain-design/README.md): 8 candidate BCs, 11 context contracts, 12 candidate aggregate/invariants, event storming and [Refund consistency ADR](../04-solution-proposal/adrs/ADR-0013-refund-boundary-and-reservation.md). Audit collection is cross-cutting infrastructure; Operations investigation may form a separate business context.
+
 ## Capabilities → bounded contexts (working hypotheses)
 
 | Capability | Context | Core vs supporting | Owns data |

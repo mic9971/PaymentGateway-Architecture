@@ -39,3 +39,10 @@ Modular Monolith + workers is only a **candidate proposal**, not an approved dec
 - **Gate D:** approve test evidence and release readiness.
 
 Avoid production secrets and customer payment data in this repository.
+
+## Day 2 — DDD Design Pack v1.1 (in review)
+
+- [Strategic DDD documentation](docs/03-domain-design/README.md) — 8 candidate Bounded Contexts, capability map, context contracts, aggregates and invariants, event storming, glossary, PostgreSQL ownership, .NET module structure, DDD review gates.
+- [Editable Excel workbook — 51 sheets](https://docs.google.com/spreadsheets/d/1WfbSCEKQRXnYwJvuz7XT4Q_gZ5v0QPwt/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true) — previous E2E 42 tabs preserved, 9 new detailed DDD tabs.
+- [ADR-0013 Refund boundary](docs/04-solution-proposal/adrs/ADR-0013-refund-boundary-and-reservation.md) — two financial consistency options still **Proposed**, not accepted.
+- Work remains on `feature/day01-requirements-discovery` and [Draft PR #1](https://github.com/mic9971/PaymentGateway-Architecture/pull/1). No changes have been merged into `develop` or `main`.
