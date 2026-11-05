@@ -1,0 +1,13 @@
+ID,Hypothesis,Impact_If_Wrong,Validator,Evidence,Status
+ASM-001,Gateway does not custody funds,Ledger/compliance scope expands,Sponsor/Legal,Money movement diagram and contract,Needs Confirmation
+ASM-002,PSP idempotent create-payment operation,Duplicate charge risk,PSP Lead,API contract + sandbox,Needs Confirmation
+ASM-003,PSP status inquiry by stable reference,Unknown outcomes unrecoverable without other process,PSP Lead,API contract + sandbox,Needs Confirmation
+ASM-004,Async payment accepted by merchant,Checkout changes,Product Owner,UX acceptance,Needs Confirmation
+ASM-005,Multi-merchant tenancy,Security/data boundary changes,Product Owner,Tenant model,Needs Confirmation
+ASM-006,Two PSP partners ready for MVP,Provider integration delays,PSP Lead,Partner agreements,Needs Confirmation
+ASM-007,Single-region sufficient for MVP,HA/DR cost/topology changes,Sponsor/SRE,Approved RTO/RPO,Needs Confirmation
+ASM-008,No raw card data in gateway,PCI/compliance scope expands,Security/Legal,Data-flow analysis,Needs Confirmation
+ASM-009,10k/day is payments; 30k/50k are separate scenarios,Sizing inaccurate,Product Owner,Arrival rate and traffic definitions,Needs Confirmation
+ASM-010,RabbitMQ needed for reliable async work,Operational cost without benefit,Architect,Option review,Proposed
+ASM-011,Redis cache justified by workload,Extra consistency risk/cost,Architect,Read profile and performance test,Proposed
+ASM-012,Production runtime supported at go-live,.NET version upgrade risk,Engineering Lead,Runtime support check,Needs Confirmation

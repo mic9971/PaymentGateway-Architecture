@@ -1,0 +1,19 @@
+ID,Capability,BR_Link,Priority,Status,Acceptance_Evidence
+FR-001,Create payment,BR-005,Must,Proposed,API + integration test
+FR-002,Get payment status / merchant scope,BR-005,Must,Proposed,API + authorization tests
+FR-003,PSP adapter integration,BR-004,Must,Proposed,Sandbox contract tests
+FR-004,PSP routing,BR-004,Should,Proposed,Audited deterministic routing; safe failover rule
+FR-005,PSP webhook verification and deduplication,BR-006,Must,Proposed,Signature/replay/ordering tests
+FR-006,Whole/partial refund,BR-006,Must,Proposed,Concurrent refund invariant test
+FR-007,Payment reconciliation,BR-006,Must,Proposed,Mismatch and unknown recovery tests
+FR-008,Merchant outbound webhook,BR-007,Should,Proposed,Signed delivery and retry evidence
+FR-009,Financial audit events,BR-006,Must,Proposed,Traced state changes
+FR-010,Merchant-scoped payment idempotency,BR-006,Must,Proposed,Concurrent submit and PSP timeout tests
+FR-011,Merchant authentication,BR-001,Must,Proposed,Credentials lifecycle tests
+FR-012,Tenant data isolation,BR-001,Must,Proposed,Cross-merchant rejection test
+FR-013,Provider health information,BR-004,Should,Proposed,Health and error classification metrics
+FR-014,Operations investigation,BR-006,Should,Proposed,Audited operator access
+FR-015,Expiry / cancellation,BR-005,Should,Proposed,Transition invariant tests
+FR-016,PSP correlation/reference,BR-006,Must,Proposed,End-to-end trace link
+FR-017,Merchant webhook delivery history,BR-007,Should,Proposed,Retry event evidence
+FR-018,Aggregated reporting,BR-006,Could,Proposed,Authorized export

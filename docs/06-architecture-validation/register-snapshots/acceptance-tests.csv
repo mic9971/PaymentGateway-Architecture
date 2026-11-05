@@ -1,0 +1,11 @@
+ID,Test_Area,Linked_ID,Test_Case,Expected,Execution
+T-001,Idempotency,FR-010/NFR-001,Concurrent identical requests,"One logical payment, no duplicate charge",Not Run
+T-002,Unknown outcome,NFR-002,Timeout after PSP success,No unsafe replay; eventual reconciliation,Not Run
+T-003,Webhook security,FR-005/NFR-006,"Forged, replayed or out-of-order callback",Reject/dedup/state rules,Not Run
+T-004,Tenant isolation,FR-012/NFR-006,Merchant A reads B,Denied/audited,Not Run
+T-005,PSP adapter contracts,FR-003/NFR-008,Different providers,Normalized semantics,Not Run
+T-006,Performance/capacity,NFR-003/NFR-004,Approved workload and bursts,p95/p99 targets TBD,Not Run
+T-007,DB restore,NFR-005,Restore from failure,RTO/RPO TBD,Not Run
+T-008,Outbox recovery,NFR-010,Crash after commit before publish,No lost committed event,Not Run
+T-009,RabbitMQ delivery,NFR-010,Consumer crash/redelivery,No duplicate provider side effect,Not Run
+T-010,Refund concurrency,FR-006/NFR-009,Concurrent refunds,Refunds ≤ refundable amount,Not Run

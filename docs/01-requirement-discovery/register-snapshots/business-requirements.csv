@@ -1,0 +1,10 @@
+ID,Requirement,Owner,Priority,Approval
+BR-001,Unified multi-merchant payment acceptance,Product Owner,Must,Needs Confirmation
+BR-002,Confirm funds custody and settlement scope,Sponsor/Legal,Must,Needs Confirmation
+BR-003,VietQR and e-wallet via contracted partners,Product Owner,Must,Proposed
+BR-004,Integrate two PSP partners in MVP,Product Owner,Must,Proposed
+BR-005,Merchant-facing create/status payment lifecycle,Product Owner,Must,Proposed
+BR-006,Auditable payment/refund/reconciliation outcomes,Finance,Must,Proposed
+BR-007,Reliable signed merchant webhook notifications,Product Owner,Should,Proposed
+BR-008,Deliver approved MVP within six months and budget,Sponsor,Must,Needs Confirmation
+BR-009,Add PSP adapters without breaking merchant API,Architect,Should,Proposed
