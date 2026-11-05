@@ -54,3 +54,13 @@ Avoid production secrets and customer payment data in this repository.
 - **New open decisions:** Attempt aggregate boundary (ADR-0014), provider timeout/idempotency recovery (ADR-0015). RefundBudget ADR-0013 remains open.
 - **Tests:** 20 designed failure scenarios, **none run**. **Gates:** 16 open; no customer/PSP/Finance approvals claimed.
 - Changes remain on `feature/day01-requirements-discovery` / Draft PR #1. No merge into `develop` or `main`.
+
+## Payment Core Implementation Foundation v0.1 (Draft PR #2)
+
+- [Implementation guide and Docker instructions](docs/10-implementation/README.md)
+- [Implementation status tracker](docs/10-implementation/IMPLEMENTATION-STATUS.csv)
+- [.NET 10 projects](src/) and [unit/integration tests](tests/)
+- [Proposed ADR-0016: Production runtime](docs/04-solution-proposal/adrs/ADR-0016-production-runtime.md)
+- [Draft code PR #2](https://github.com/mic9971/PaymentGateway-Architecture/pull/2): `feature/payment-core-foundation` → `feature/day01-requirements-discovery`. Separate from [Draft architecture docs PR #1](https://github.com/mic9971/PaymentGateway-Architecture/pull/1) → `develop`.
+
+**Development-only:** Mock PSP, demo merchant header, and PostgreSQL-only Outbox persistence; there is no real VietQR/PSP, no RabbitMQ publisher, no production authentication. Check PR CI before calling any implementation validated. Do not merge without explicit approval.

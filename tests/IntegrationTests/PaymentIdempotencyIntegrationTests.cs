@@ -95,4 +95,72 @@ public sealed class PaymentIdempotencyIntegrationTests
         var completedAgain = await worker.CompleteAsync(claimed, PaymentGateway.Payments.Domain.PaymentState.Succeeded, CancellationToken.None);
         Assert.False(completedAgain);
     }
+
+
+    [Fact]
+    public async Task IdempotencyKeyIsScopedToAuthenticatedMerchant()
+    {
+        if (string.IsNullOrWhiteSpace(ConnectionString)) return;
+        await using var ds = NpgsqlDataSource.Create(ConnectionString);
+        var service = new PaymentService(new NpgsqlPaymentStore(ds));
+        var sharedKey = "same-key-" + Guid.NewGuid().ToString("N");
+        var first = new CreatePaymentCommand(Guid.NewGuid(), sharedKey, "order-demo", 100, "VND", "MOCK");
+        var second = first with { AuthenticatedMerchantId = Guid.NewGuid() };
+
+        var a = await service.CreateAsync(first, CancellationToken.None);
+        var b = await service.CreateAsync(second, CancellationToken.None);
+        Assert.NotEqual(a.Payment.PaymentId, b.Payment.PaymentId);
+        Assert.False(a.Replayed);
+        Assert.False(b.Replayed);
+    }
+
+    [Fact]
+    public async Task ExpiredAttemptIsUnknownAndNotReissued()
+    {
+        if (string.IsNullOrWhiteSpace(ConnectionString)) return;
+        await using var ds = NpgsqlDataSource.Create(ConnectionString);
+        var service = new PaymentService(new NpgsqlPaymentStore(ds));
+        var command = new CreatePaymentCommand(Guid.NewGuid(), "crash-" + Guid.NewGuid().ToString("N"),
+            "crashed-worker-demo", 500000, "VND", "MOCK");
+        var created = await service.CreateAsync(command, CancellationToken.None);
+
+        // Simulate worker committing a claim, then crashing after an uncertain PSP operation.
+        await using (var conn = await ds.OpenConnectionAsync())
+        {
+            await using var tx = await conn.BeginTransactionAsync();
+            await using (var attempt = new NpgsqlCommand("""
+                UPDATE payment.payment_attempts SET state='Processing',
+                    claim_id=@claim, lease_until=now() - interval '1 minute'
+                WHERE payment_id=@payment AND state='Pending'
+                """, conn, tx))
+            {
+                attempt.Parameters.AddWithValue("payment", created.Payment.PaymentId);
+                attempt.Parameters.AddWithValue("claim", Guid.NewGuid());
+                Assert.Equal(1, await attempt.ExecuteNonQueryAsync());
+            }
+            await using (var pay = new NpgsqlCommand("""
+                UPDATE payment.payment_intents SET state='Processing', version=version+1
+                WHERE payment_id=@payment AND state='Pending'
+                """, conn, tx))
+            {
+                pay.Parameters.AddWithValue("payment", created.Payment.PaymentId);
+                Assert.Equal(1, await pay.ExecuteNonQueryAsync());
+            }
+            await tx.CommitAsync();
+        }
+
+        var worker = new NpgsqlPaymentWorkStore(ds);
+        Assert.True(await worker.MarkOneExpiredClaimUnknownAsync(CancellationToken.None));
+        var after = await service.GetAsync(command.AuthenticatedMerchantId, created.Payment.PaymentId, CancellationToken.None);
+        Assert.NotNull(after);
+        Assert.Equal(PaymentGateway.Payments.Domain.PaymentState.Unknown, after!.State);
+
+        await using var checkConn = await ds.OpenConnectionAsync();
+        await using var check = new NpgsqlCommand("""
+            SELECT state FROM payment.payment_attempts WHERE payment_id=@payment
+            """, checkConn);
+        check.Parameters.AddWithValue("payment", created.Payment.PaymentId);
+        Assert.Equal("Unknown", (string)(await check.ExecuteScalarAsync())!);
+    }
+
 }
