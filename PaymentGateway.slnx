@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="src/Gateway.Api/Gateway.Api.csproj" />
+  <Project Path="src/Gateway.Worker/Gateway.Worker.csproj" />
+  <Project Path="src/Modules/Payments/Domain/Payments.Domain.csproj" />
+  <Project Path="src/Modules/Payments/Application/Payments.Application.csproj" />
+  <Project Path="src/Modules/Payments/Infrastructure/Payments.Infrastructure.csproj" />
+  <Project Path="tests/UnitTests/Payment.Core.UnitTests.csproj" />
+  <Project Path="tests/IntegrationTests/Payment.IntegrationTests.csproj" />
+</Solution>
