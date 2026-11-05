@@ -1,4 +1,4 @@
-# Local-only demo. No real PSP integrations, bank data, or merchant authentication.
+# Local demo only. No bank integrations. Credentials must be set in .env.
 name: paymentgateway-demo
 services:
   postgres:
@@ -17,6 +17,22 @@ services:
       interval: 5s
       timeout: 3s
       retries: 12
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: demo
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbit-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 6s
+      retries: 15
 
   api:
     build:
@@ -39,11 +55,14 @@ services:
     environment:
       DOTNET_ENVIRONMENT: Development
       ConnectionStrings__Payments: "Host=postgres;Port=5432;Database=payment_demo;Username=payment_demo;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env};Pooling=true"
+      RabbitMq__Uri: "amqp://demo:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in .env}@rabbitmq:5672/"
       MockPsp__Outcome: "Succeeded"
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
 volumes:
   pg-data:
-
+  rabbit-data:
