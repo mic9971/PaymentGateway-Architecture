@@ -1,0 +1,12 @@
+ID,Decision,Owner,Status,Evidence
+G-WH-01,Real PSP signature scheme + replay tolerance,PSP Lead,Needs Confirmation,Partner contract
+G-WH-02,Payment finality vs QR readiness,Finance + Product,Needs Confirmation,PSP API semantics
+G-WH-03,Provider operation/merchant correlation scope,Security + PSP,Needs Confirmation,Provider sample data
+G-WH-04,Webhook idempotency retention and out-of-order policy,Architect + PSP,Needs Confirmation,Partner replay terms
+G-WH-05,Contradictory callback escalation,Finance + Ops,Needs Confirmation,Investigation workflow
+G-WH-06,Context ownership and Payment command boundary,Architect,Proposed,ADR-0019
+G-WH-07,HTTP signed callback end-to-end test,QA + Security,Not Run,Integration suite
+G-WH-08,Real PSP sandbox callback test,PSP Lead,Not Run,Partner sandbox
+G-WH-09,Broker/DB outage and restore game day,SRE + Ops,Not Run,Runbook/evidence
+G-WH-10,Secret management and production AuthN,Security,Not Run,Security design
+G-WH-11,Go-live reconciliation and settlement proof,Finance + Legal,Not Run,Finance evidence

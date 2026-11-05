@@ -23,3 +23,10 @@ Atomic Unknown resolution,Implemented (Demo),REC-04 passed,Only simulated defini
 Outbox publish failure simulation,Tested (Simulated),MSG-01 passed,5-minute broker outage not executed,Manual game day
 Broker confirm-to-DB mark gap,Tested (Real RabbitMQ),MSG-02 passed,Process kill not executed,Manual game day
 Recovery tracker v0.3,Updated,19 automated tests passed,7 test/evidence items remain Not Run,https://docs.google.com/spreadsheets/d/1OzzZGORlTJ0tEIjk9MTlvAmXjLp2KZDa/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
+
+Mock signed PSP webhook validation,Implemented (Demo),WH-T01 passed,Real PSP signature/key rotation unknown,Partner security contract
+Mock webhook inbox idempotency,Implemented (Demo),WH-T02 WH-T03 passed,Provider event-id retention unknown,PSP integration review
+Terminal state conflict handling,Implemented (Demo),WH-T04 passed,No Finance investigation case UI,Ops business workflow
+Webhook amount and operation correlation,Implemented (Demo),WH-T05 passed,PSP merchant-account binding unapproved,Security/PSP review
+Reconciliation mismatch ledger,Implemented (Demo),WH-T06 passed,Mock provider same PostgreSQL host; no real statements,Finance validation
+Webhook tracker v0.4,Updated,25 automated tests passed,HTTP route + real PSP sandbox Not Run,https://docs.google.com/spreadsheets/d/1-KWKpiXq7nJyy0ItsacSh-tJRvRXy8OE/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
