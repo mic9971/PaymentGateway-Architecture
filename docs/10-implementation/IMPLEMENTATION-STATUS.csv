@@ -6,9 +6,13 @@ PostgreSQL idempotency,Implemented,12-concurrent-create test designed,CI 9/9 PAS
 Payment + Attempt + Outbox atomic,Implemented,Outbox-count integration test designed,No RabbitMQ publisher,Implement publisher
 Mock PSP background worker,Implemented,Worker claim test PASSED,No real provider and inquiry,Add Mock Inquiry
 Unknown on expired worker lease,Implemented,No crash injection executed,No automated inquiry recovery,Implement recovery tests
-RabbitMQ publishing,Not Implemented,Not Run,Outbox messages remain in DB,Add publisher confirms
+RabbitMQ publishing,Implemented (Demo),MQ-IT-03 passed,Outbox may replay after confirm-before-mark,Run broker outage fault-injection
 PSP webhook signature,Not Implemented,Not Run,No external callbacks,Add provider-specific ACL
 RefundBudget,Not Implemented,Not Run,ADR-0013 still open,Finance decision
 Production authentication,Not Implemented,Not Run,Development-only header,Design merchant auth
 Production runtime decision,Proposed,Not applicable,.NET 10 requires architecture approval,ADR review
 Integration test evidence,Verified,3 unit + 6 PostgreSQL integration tests PASSED,Does not prove PSP side-effect correctness,https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/41969726629
+RabbitMQ audit consumer,Implemented (Demo),MQ-IT-01 and MQ-IT-02 passed,Not a financial PSP consumer,Approve downstream event contract
+RabbitMQ quorum DLQ,Implemented (Demo),No DLQ drill executed,Retry limit and recovery operation not signed off,Run poison-message game day
+Broker outage recovery,Not Run,Not Run,Outbox claim/retry implemented only,Run 5-minute outage and recovery drill
+Implementation Tracker v0.2,Updated,12 tests passed,No E2E real bank proof,https://docs.google.com/spreadsheets/d/1_hs9dEStZ2208wy6APN1e2YX4B4qX0hG/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true

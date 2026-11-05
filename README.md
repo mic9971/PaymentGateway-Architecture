@@ -67,3 +67,12 @@ Avoid production secrets and customer payment data in this repository.
 
 - [Implementation Tracker Excel v0.1 — 6 sheets](https://docs.google.com/spreadsheets/d/1GSFJbTdbNP5JpYwJWmZccv2A4vSEHo7R/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true) — features, test evidence, risks, ADR gates, delivery plan and local runbook.
 - [GitHub Actions evidence: 3 unit + 6 PostgreSQL integration tests PASSED](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/41969726629).
+
+## Messaging Implementation — RabbitMQ Outbox + Inbox v0.2
+
+- [Implementation design, failure contracts and local runbook](docs/11-messaging-implementation/README.md).
+- [Architecture decision ADR-0017](docs/04-solution-proposal/adrs/ADR-0017-outbox-rabbitmq-inbox.md).
+- [Messaging Implementation Tracker v0.2 — 11 Excel tabs](https://docs.google.com/spreadsheets/d/1_hs9dEStZ2208wy6APN1e2YX4B4qX0hG/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true) (prior 7 tabs preserved plus 4 messaging review tabs).
+- [GitHub Actions evidence: 3 unit + 9 PostgreSQL/RabbitMQ integration tests passed](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/41982031767).
+- Feature branch: `feature/rabbitmq-outbox-inbox`, based on `feature/payment-core-foundation`. **Do not merge without review.**
+- This increment publishes **payment integration events** only. RabbitMQ messages do **not** trigger Mock PSP calls or any bank charges.
