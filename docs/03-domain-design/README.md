@@ -36,3 +36,7 @@ DDD Readme, DDD BC Catalog, DDD Capabilities, DDD Context Map, DDD Aggregates, D
 ## Review workflow
 
 Review the Excel gate register, correct the conceptual boundaries, obtain provider contracts, decide transaction constraints, document accepted ADRs, then implement architecture tests. The branch remains under **Draft PR #1**; no merge to develop/main without user approval.
+
+## Payment Core v1.2 — tactical follow-on
+
+[Read the technical design](../09-payment-core-tactical/README.md) and [open the 64-sheet workbook](https://docs.google.com/spreadsheets/d/16LyqBQmwThYFXQz9x9LkdENNXnKhRfsH/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true). This refines PaymentIntent, PaymentAttempt and IdempotencyRecord, but **does not approve** aggregate boundaries, PSP outcome policies or RefundBudget. See the proposed ADR-0014/0015 in Payment Core and the existing ADR-0013 in Solution Proposal. No migrations or actual PSP calls have been implemented.

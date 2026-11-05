@@ -64,3 +64,11 @@ Do not modify old v0.1 files in place without explicit version-control intent. E
 - **GitHub:** [Strategic DDD documentation](../03-domain-design/README.md), [Context Map](../03-domain-design/02-context-map-and-contracts.md), [Refund ADR-0013](../04-solution-proposal/adrs/ADR-0013-refund-boundary-and-reservation.md).
 - **Status:** 8 BCs proposed, 14 DDD review gates open. Financial custody, PSP contracts and Refund consistency boundary remain **Needs Confirmation**.
 - Excel workbook is hosted on Drive and GitHub CSV/Markdown are review snapshots, not an automatic live sync.
+
+## Payment Core Tactical Design v1.2 — current technical design
+
+- **Editable Excel:** [PaymentGateway_PaymentCore_TacticalDesign_v1.2.xlsx](https://docs.google.com/spreadsheets/d/16LyqBQmwThYFXQz9x9LkdENNXnKhRfsH/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true); 64 sheets, preserving the previous 51 DDD v1.1 sheets. Source Excel remains on Drive, linked here.
+- **Architecture text:** [Payment Core Tactical Design Index](../09-payment-core-tactical/README.md).
+- **Review snapshots:** [State Machine](../09-payment-core-tactical/register-snapshots/payment-states-v1.2.csv), [Acceptance Tests](../09-payment-core-tactical/register-snapshots/acceptance-tests-v1.2.csv), [Gates](../09-payment-core-tactical/register-snapshots/review-gates-v1.2.csv).
+- **Status:** Proposed. Real PSP idempotency/inquiry, bank/VietQR financial finality, refund budget and custody scope remain unapproved. 20 test designs not run, 16 gates open.
+- **Important:** The Excel workbook and GitHub CSV/Markdown snapshots are NOT automatically synchronized. Older versions remain as historical baselines.
