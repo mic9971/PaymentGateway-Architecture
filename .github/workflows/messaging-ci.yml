@@ -1,0 +1,62 @@
+name: RabbitMQ Outbox Inbox CI
+
+on:
+  push:
+    branches:
+      - feature/rabbitmq-outbox-inbox
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'deploy/compose/**'
+      - '.github/workflows/messaging-ci.yml'
+      - 'PaymentGateway.slnx'
+
+jobs:
+  messaging-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: payment_demo
+          POSTGRES_DB: payment_demo
+          POSTGRES_PASSWORD: local-ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U payment_demo -d payment_demo"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+      rabbitmq:
+        image: rabbitmq:4-management
+        env:
+          RABBITMQ_DEFAULT_USER: demo
+          RABBITMQ_DEFAULT_PASS: local-ci-rabbit-only
+        ports:
+          - 5672:5672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 6s
+          --health-retries 15
+    env:
+      PAYMENT_TEST_CONNECTION_STRING: Host=localhost;Port=5432;Database=payment_demo;Username=payment_demo;Password=local-ci-only
+      RABBITMQ_TEST_URI: amqp://demo:local-ci-rabbit-only@localhost:5672/
+      PGPASSWORD: local-ci-only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Apply local test schema and messaging migration
+        run: |
+          psql -h localhost -U payment_demo -d payment_demo -v ON_ERROR_STOP=1 -f deploy/compose/postgres-init/001_payment_core.sql
+          psql -h localhost -U payment_demo -d payment_demo -v ON_ERROR_STOP=1 -f deploy/compose/postgres-init/002_messaging.sql
+      - name: Restore
+        run: dotnet restore PaymentGateway.slnx
+      - name: Build
+        run: dotnet build PaymentGateway.slnx -c Release --no-restore --warnaserror
+      - name: Unit and PostgreSQL/RabbitMQ integration tests
+        run: dotnet test PaymentGateway.slnx -c Release --no-build --logger "console;verbosity=normal"

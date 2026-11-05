@@ -8,5 +8,6 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
     <ProjectReference Include="../Modules/Payments/Application/Payments.Application.csproj" />
     <ProjectReference Include="../Modules/Payments/Infrastructure/Payments.Infrastructure.csproj" />
+    <ProjectReference Include="../BuildingBlocks/Messaging/Messaging.csproj" />
   </ItemGroup>
 </Project>
