@@ -1,4 +1,5 @@
 using Npgsql;
+using NpgsqlTypes;
 using PaymentGateway.Payments.Domain;
 
 namespace PaymentGateway.Payments.Infrastructure;
@@ -12,13 +13,21 @@ public sealed record ClaimedUnknownAttempt(
 /// </summary>
 public sealed class NpgsqlUnknownRecoveryStore(NpgsqlDataSource dataSource)
 {
-    public async Task<ClaimedUnknownAttempt?> ClaimOneAsync(CancellationToken ct)
+    public Task<ClaimedUnknownAttempt?> ClaimOneAsync(CancellationToken ct)
+        => ClaimAsync(null, ct);
+
+    // Targeted diagnostic operation, intentionally not exposed as public merchant HTTP API.
+    public Task<ClaimedUnknownAttempt?> ClaimPaymentAsync(Guid paymentId, CancellationToken ct)
+        => ClaimAsync(paymentId, ct);
+
+    private async Task<ClaimedUnknownAttempt?> ClaimAsync(Guid? paymentId, CancellationToken ct)
     {
         await using var conn = await dataSource.OpenConnectionAsync(ct);
         await using var cmd = new NpgsqlCommand("""
             WITH candidate AS (
                 SELECT attempt_id FROM payment.payment_attempts
                 WHERE state='Unknown' AND inquiry_count < 5
+                  AND (@payment_filter IS NULL OR payment_id=@payment_filter)
                   AND (next_inquiry_at IS NULL OR next_inquiry_at <= now())
                 ORDER BY updated_at, attempt_id
                 LIMIT 1 FOR UPDATE SKIP LOCKED
@@ -31,6 +40,7 @@ public sealed class NpgsqlUnknownRecoveryStore(NpgsqlDataSource dataSource)
             """, conn);
         var token = Guid.NewGuid();
         cmd.Parameters.AddWithValue("token", token);
+        cmd.Parameters.AddWithValue("payment_filter", NpgsqlDbType.Uuid, (object?)paymentId ?? DBNull.Value);
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         if (!await reader.ReadAsync(ct)) return null;
         return new ClaimedUnknownAttempt(
@@ -87,8 +97,13 @@ public enum RecoveryResult { NoWork, Unresolved, VerifiedSuccess, VerifiedFailur
 public sealed class PaymentRecoveryService(NpgsqlUnknownRecoveryStore store, NpgsqlMockPspLedger provider)
 {
     public async Task<RecoveryResult> RecoverOneAsync(CancellationToken ct)
+        => await ResolveClaimAsync(await store.ClaimOneAsync(ct), ct);
+
+    public async Task<RecoveryResult> RecoverPaymentAsync(Guid paymentId, CancellationToken ct)
+        => await ResolveClaimAsync(await store.ClaimPaymentAsync(paymentId, ct), ct);
+
+    private async Task<RecoveryResult> ResolveClaimAsync(ClaimedUnknownAttempt? claimed, CancellationToken ct)
     {
-        var claimed = await store.ClaimOneAsync(ct);
         if (claimed is null) return RecoveryResult.NoWork;
 
         var verified = await provider.QueryAsync(claimed.ProviderOperationKey, ct);
