@@ -1,0 +1,17 @@
+Gate,Approval,Owner,Status
+G-CORE-01,Custody and settlement,Sponsor/Finance/Legal,Needs Confirmation
+G-CORE-02,Finality semantics,Finance/Product/PSP,Needs Confirmation
+G-CORE-03,PSP idempotency and inquiry,PSP Lead,Needs Confirmation
+G-CORE-04,VietQR confirmation/late transfer,PSP/Finance,Needs Confirmation
+G-CORE-05,Idempotency API contract,Product/Architect,Needs Confirmation
+G-CORE-06,Payment state machine,Product/Finance,Needs Confirmation
+G-CORE-07,PaymentAttempt aggregate,Architect,Needs Confirmation
+G-CORE-08,Unknown recovery,PSP/Finance,Needs Confirmation
+G-CORE-09,DB constraints,DBA/QA,Not Run
+G-CORE-10,Outbox and MQ,Platform/QA,Not Run
+G-CORE-11,Webhook security,Security/PSP,Not Run
+G-CORE-12,RefundBudget ADR-0013,Finance/Architect,Needs Confirmation
+G-CORE-13,Tenant isolation,Security/QA,Not Run
+G-CORE-14,Workload/SLO,Product/SRE,Needs Confirmation
+G-CORE-15,Production runtime,Engineering,Needs Confirmation
+G-CORE-16,Evidence acceptance,Architecture Board,Not Run

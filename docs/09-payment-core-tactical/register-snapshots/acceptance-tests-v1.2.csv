@@ -1,0 +1,21 @@
+ID,Scenario,PassCriterion,Execution,Owner
+PC-T01,Same-key concurrent create,One logical operation,Not Run,QA/Payment
+PC-T02,Same-key different payload,Conflict; no mutation,Not Run,QA/Payment
+PC-T03,Concurrent worker claim,No duplicate unsafe attempt,Not Run,QA/Payment
+PC-T04,PSP paid then timeout,No blind retry; verified recovery,Not Run,PSP/Finance
+PC-T05,Definitive PSP decline,Only definitive no-charge Failed,Not Run,PSP
+PC-T06,Definitive PSP payment,Succeeded only with evidence,Not Run,PSP/Finance
+PC-T07,Early webhook,Correct transition,Not Run,PSP
+PC-T08,Inquiry after lost webhook,Unknown resolves correctly,Not Run,PSP
+PC-T09,Forged/replayed webhook,Rejected or safe dedup,Not Run,Security/PSP
+PC-T10,DB commit+MQ down,Outbox no loss,Not Run,Platform
+PC-T11,RabbitMQ redelivery,No duplicate PSP charge,Not Run,Platform/QA
+PC-T12,Cross-tenant read,Denied,Not Run,Security
+PC-T13,Operator unauthorized change,Denied and auditable,Not Run,Security/Ops
+PC-T14,Late QR transfer,"Finance decision, not silent failed",Not Run,Finance/PSP
+PC-T15,Key retention expiry,Documented response,Not Run,Product/QA
+PC-T16,Concurrent refund budget,No over-refund,Not Run,Finance/QA
+PC-T17,DB disconnect mid Tx,No partial commit,Not Run,DBA
+PC-T18,Redis outage,Payment correct,Not Run,Platform
+PC-T19,QR generated HTTP 200,Not prematurely Succeeded,Not Run,PSP
+PC-T20,Read during callback update,"Tenant safe, coherent",Not Run,QA
