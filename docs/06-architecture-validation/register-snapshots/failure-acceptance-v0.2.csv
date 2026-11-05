@@ -1,0 +1,17 @@
+Failure_ID,Scenario,Candidate_Pass_Criterion,Evidence_Needed,Criticality
+FAIL-001,Concurrent duplicate create,No duplicate charge,PSP idempotency + DB uniqueness,Critical
+FAIL-002,PSP charge success with network timeout,UNKNOWN → status inquiry; no blind retry,PSP sandbox fault test,Critical
+FAIL-003,Provider without idempotent create,No unsafe repeat operation,Provider recovery contract,Critical
+FAIL-004,"QR expires, payer pays late",Correct late payment handling / escalation,Provider callback/reconciliation tests,High
+FAIL-005,Webhook arrives before API response,Valid final state,Ordering scenarios,High
+FAIL-006,Webhook duplicate,One logical state change,Inbox dedup test,High
+FAIL-007,Forged webhook,Reject and trace,Signature and replay tests,Critical
+FAIL-008,DB commit but MQ publish fails,Committed event recoverable,Outbox recovery test,High
+FAIL-009,Worker crash after PSP call,No unsafe duplicate charge,Crash/restart test,Critical
+FAIL-010,PSP A timed out; route to PSP B,No automatic double charge,Cross-provider unknown outcome policy,Critical
+FAIL-011,Two concurrent refunds,Total refund <= allowable amount,Concurrency test,Critical
+FAIL-012,Cross-merchant access,Denied and audited,Auth test,Critical
+FAIL-013,PSP statement discrepancy,Resolvable mismatch with audit,Reconciliation test,High
+FAIL-014,Redis outage,Payments remain correct,Cache fallback test,Medium
+FAIL-015,Merchant callback down,Durable retries & retrieval,Delivery replay test,High
+FAIL-016,Provider settlement file late,Tracked unresolved period,Finance cutoff test,Medium

@@ -6,7 +6,7 @@
 >
 > **Working branch:** `feature/day01-requirements-discovery`. Changes should be reviewed by PR into `develop`, then promoted to `main` when approved.
 
-These three Excel workbooks are the **canonical editable versions**. They are stored as original `.xlsx` files on connected Google Drive (not converted to native Google Sheets). They contain 26 worksheet tabs in total.
+The three v0.1 Excel workbooks below are the **baseline references**. Product Discovery v0.2 is now the **active Day 1 discovery draft**. Preserve v0.1 for comparison; do not treat any workbook as an approved customer contract. They are stored as original `.xlsx` files on connected Google Drive (not converted to native Google Sheets). The v0.1 baselines contain 26 worksheet tabs; Product Discovery v0.2 retains its original 9 tabs and adds 6 deep-review tabs.
 
 | Document | Excel copy | Tabs | Contents |
 |---|---|---|---|
@@ -37,3 +37,15 @@ These three Excel workbooks are the **canonical editable versions**. They are st
 5. Approve budget, measurable SLOs, RTO/RPO, team capacity, go-live criteria and MVP exclusions.
 
 **No production architecture proposal should be approved before these dependencies have owners and evidence.**
+
+## Current Day 1 draft — Product Discovery v0.2
+
+- **Editable Excel:** [01_PaymentGateway_Product_Discovery_v0.2.xlsx](https://docs.google.com/spreadsheets/d/1NG0C3T2jWS5pj3Kcuvf6vfQVbB2kKY6Z/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true)
+- **Version:** v0.2; status: **in discovery — not approved**.
+- **Original 9 tabs preserved**, plus: Decision Board, Money Flow RACI, Payment E2E Journey, Failure Acceptance, Discovery Gate, Day 1 Review Dashboard.
+- **Open decisions:** 12/12. **Open approval gates:** 13/13. **Failure scenarios prepared:** 16/16. All counts reflect the draft baseline, not customer confirmation.
+- **Review note:** [Business Boundary Review v0.2](./business-boundary-review-v0.2.md).
+- **Workshop script:** [Customer Review Agenda](../01-requirement-discovery/day01-customer-review-agenda.md).
+- **GitHub review snapshots:** [Decision Board](../01-requirement-discovery/register-snapshots/decision-board-v0.2.csv), [Failure Cases](../06-architecture-validation/register-snapshots/failure-acceptance-v0.2.csv).
+
+Do not modify old v0.1 files in place without explicit version-control intent. Excel and CSV snapshots are not automatically synchronized.
