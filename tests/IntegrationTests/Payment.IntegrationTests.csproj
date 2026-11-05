@@ -14,5 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Modules/Payments/Application/Payments.Application.csproj" />
     <ProjectReference Include="../../src/Modules/Payments/Infrastructure/Payments.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/BuildingBlocks/Messaging/Messaging.csproj" />
   </ItemGroup>
 </Project>
