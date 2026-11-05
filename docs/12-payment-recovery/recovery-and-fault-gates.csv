@@ -1,0 +1,10 @@
+ID,Scenario,Expected,Test_Evidence,Status,Owner
+REC-01,PSP confirmed success but response lost,Unknown resolves to Succeeded with no second provider effect,CI integration test,Automated test authored,QA/PSP
+REC-02,Timeout before provider effect,No fabricated failure and no retry,CI integration test,Automated test authored,QA/PSP
+REC-03,Stable provider key replay,One mock provider row and original outcome,CI integration test,Automated test authored,QA
+REC-04,Concurrent status inquiry,One definitive state transition and outbox,CI integration test,Automated test authored,QA
+MSG-01,Broker unavailable simulation,DB Outbox remains unpublished and lease retry works,CI integration test,Automated test authored,Platform
+MSG-02,Broker confirmed then DB mark lost,Same EventId twice but one Inbox projection,CI integration test,Automated test authored,Platform
+GAME-01,Five-minute RabbitMQ outage,Backlog persists then drains after restart,Manual game day,Not Run,SRE
+GAME-02,Worker kill after PSP effect,Unknown and inquiry without charge retry,Manual game day,Not Run,PSP/SRE
+GAME-03,Poison events to DLQ,Controlled redrive without invalid state transitions,Manual game day,Not Run,SRE/Security
