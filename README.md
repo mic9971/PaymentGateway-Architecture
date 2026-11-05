@@ -76,3 +76,12 @@ Avoid production secrets and customer payment data in this repository.
 - [GitHub Actions evidence: 3 unit + 9 PostgreSQL/RabbitMQ integration tests passed](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/41982031767).
 - Feature branch: `feature/rabbitmq-outbox-inbox`, based on `feature/payment-core-foundation`. **Do not merge without review.**
 - This increment publishes **payment integration events** only. RabbitMQ messages do **not** trigger Mock PSP calls or any bank charges.
+
+## Payment Recovery & Fault Injection v0.3 (Draft PR #4)
+
+- [Payment Recovery Guide, failure matrix and local game days](docs/12-payment-recovery/README.md).
+- [ADR-0018: resolve Unknown through read-only inquiry](docs/04-solution-proposal/adrs/ADR-0018-safe-unknown-recovery.md).
+- [Implementation Tracker v0.3 — 15-sheet Excel](https://docs.google.com/spreadsheets/d/1OzzZGORlTJ0tEIjk9MTlvAmXjLp2KZDa/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true); 11 earlier sheets retained, 4 recovery review sheets added.
+- [Verified CI: 3 unit + 16 PostgreSQL/RabbitMQ integration tests passed](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42047986687).
+- This is a **local-only Mock PSP experiment**; no bank account, VietQR, e-wallet or real PSP is called. No real-money exactly-once proof.
+- Branch `feature/payment-recovery-fault-injection` should only enter the existing PR stack after explicit owner approval; `develop` and `main` remain untouched.
