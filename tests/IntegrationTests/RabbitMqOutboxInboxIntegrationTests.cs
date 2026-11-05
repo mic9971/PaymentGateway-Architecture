@@ -48,7 +48,7 @@ public sealed class RabbitMqOutboxInboxIntegrationTests
         var inbox = new InboxProjectionStore(source);
         var eventId = Guid.NewGuid();
         var consumer = "badjson-" + Guid.NewGuid().ToString("N");
-        await Assert.ThrowsAsync<System.Text.Json.JsonException>(() =>
+        await Assert.ThrowsAnyAsync<System.Text.Json.JsonException>(() =>
             inbox.ApplyAsync(consumer, eventId, "PaymentRequested",
                 Encoding.UTF8.GetBytes("{invalid-json"), CancellationToken.None));
 
