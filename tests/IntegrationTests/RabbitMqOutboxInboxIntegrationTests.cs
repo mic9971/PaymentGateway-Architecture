@@ -125,4 +125,72 @@ public sealed class RabbitMqOutboxInboxIntegrationTests
         }
         Assert.True(delivered);
     }
+
+    [Fact]
+    public async Task RabbitMq_AckLost_RedeliveryDoesNotDuplicateInboxProjection()
+    {
+        if (string.IsNullOrWhiteSpace(Pg) || string.IsNullOrWhiteSpace(Rabbit)) return;
+
+        await using var source = NpgsqlDataSource.Create(Pg);
+        await using var conn = await PaymentEventTopology.ConnectAsync(Rabbit, CancellationToken.None);
+        var queue = "test.ack-lost." + Guid.NewGuid().ToString("N");
+        var eventId = Guid.NewGuid();
+        var consumerName = "test-audit-" + Guid.NewGuid().ToString("N");
+        var body = Encoding.UTF8.GetBytes("{\\"simulated\\":true,\\"kind\\":\\"redelivery\\"}");
+        var inbox = new InboxProjectionStore(source);
+
+        var firstChannel = await conn.CreateChannelAsync();
+        try
+        {
+            await firstChannel.QueueDeclareAsync(queue: queue, durable: false,
+                exclusive: false, autoDelete: false, arguments: null);
+
+            await using (var publisher = await PaymentEventTopology.PublisherChannelAsync(conn, CancellationToken.None))
+            {
+                await publisher.BasicPublishAsync(
+                    exchange: "", routingKey: queue, mandatory: true,
+                    basicProperties: new BasicProperties
+                    {
+                        MessageId = eventId.ToString("D"),
+                        Type = "PaymentRequested",
+                        ContentType = "application/json"
+                    }, body: body);
+            }
+
+            var delivered = await firstChannel.BasicGetAsync(queue, autoAck: false);
+            Assert.NotNull(delivered);
+            Assert.True(await inbox.ApplyAsync(
+                consumerName, eventId, "PaymentRequested", delivered!.Body.ToArray(), CancellationToken.None));
+            // Simulate process death: close channel WITHOUT ack after Inbox TX committed.
+        }
+        finally
+        {
+            await firstChannel.DisposeAsync();
+        }
+
+        await using var secondChannel = await conn.CreateChannelAsync();
+        BasicGetResult? redelivered = null;
+        for (var retry = 0; retry < 50; retry++)
+        {
+            redelivered = await secondChannel.BasicGetAsync(queue, autoAck: false);
+            if (redelivered is not null) break;
+            await Task.Delay(100);
+        }
+        Assert.NotNull(redelivered);
+        Assert.Equal(eventId.ToString("D"), redelivered!.BasicProperties.MessageId);
+        Assert.False(await inbox.ApplyAsync(
+            consumerName, eventId, "PaymentRequested", redelivered.Body.ToArray(), CancellationToken.None));
+        await secondChannel.BasicAckAsync(redelivered.DeliveryTag, multiple: false);
+
+        await using var db = await source.OpenConnectionAsync();
+        await using var count = new NpgsqlCommand("""
+            SELECT count(*) FROM messaging.audit_projection
+            WHERE consumer_name=@consumer AND event_id=@event
+            """, db);
+        count.Parameters.AddWithValue("consumer", consumerName);
+        count.Parameters.AddWithValue("event", eventId);
+        Assert.Equal(1L, (long)(await count.ExecuteScalarAsync())!);
+        await secondChannel.QueueDeleteAsync(queue);
+    }
+
 }
