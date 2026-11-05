@@ -1,0 +1,48 @@
+name: Payment Core CI
+
+on:
+  push:
+    branches:
+      - feature/payment-core-foundation
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'deploy/compose/postgres-init/**'
+      - 'PaymentGateway.slnx'
+      - '.github/workflows/payment-core-ci.yml'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: payment_demo
+          POSTGRES_DB: payment_demo
+          POSTGRES_PASSWORD: local-ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U payment_demo -d payment_demo"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    env:
+      PAYMENT_TEST_CONNECTION_STRING: Host=localhost;Port=5432;Database=payment_demo;Username=payment_demo;Password=local-ci-only
+      PGPASSWORD: local-ci-only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Apply development test schema
+        run: psql -h localhost -U payment_demo -d payment_demo -v ON_ERROR_STOP=1 -f deploy/compose/postgres-init/001_payment_core.sql
+      - name: Restore
+        run: dotnet restore PaymentGateway.slnx
+      - name: Build
+        run: dotnet build PaymentGateway.slnx -c Release --no-restore --warnaserror
+      - name: Unit and integration tests
+        run: dotnet test PaymentGateway.slnx -c Release --no-build --logger "console;verbosity=normal"
+
