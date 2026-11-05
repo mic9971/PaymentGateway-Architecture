@@ -10,11 +10,14 @@ var connection = builder.Configuration.GetConnectionString("Payments")
 
 builder.Services.AddSingleton(NpgsqlDataSource.Create(connection));
 builder.Services.AddSingleton<NpgsqlPaymentWorkStore>();
-builder.Services.AddSingleton<MockPsp>();
+builder.Services.AddSingleton<NpgsqlUnknownRecoveryStore>();
+builder.Services.AddSingleton<NpgsqlMockPspLedger>();
+builder.Services.AddSingleton<PaymentRecoveryService>();
 
-// DB-polling payment attempt worker remains the ONLY demo process allowed to call Mock PSP.
-// RabbitMQ subscriber below is an idempotent audit projection, NOT a charge initiator.
+// Only DB-polling attempt worker may invoke Mock PSP CreatePayment.
+// The RabbitMQ consumer remains a non-financial audit projection.
 builder.Services.AddHostedService<PaymentProcessingWorker>();
+builder.Services.AddHostedService<PaymentRecoveryWorker>();
 builder.Services.AddHostedService<OutboxPublisherHostedService>();
 builder.Services.AddHostedService<AuditProjectionConsumerHostedService>();
 await builder.Build().RunAsync();

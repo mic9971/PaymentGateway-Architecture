@@ -3,59 +3,42 @@ using PaymentGateway.Payments.Infrastructure;
 
 namespace PaymentGateway.Worker;
 
-public sealed class MockPsp(IConfiguration config)
-{
-    // All outcomes are synthetic. This class performs NO bank/PSP network requests.
-    public async Task<PaymentState> InitiateAsync(ClaimedAttempt attempt, CancellationToken ct)
-    {
-        await Task.Delay(TimeSpan.FromMilliseconds(50), ct);
-        return config["MockPsp:Outcome"] switch
-        {
-            "Succeeded" => PaymentState.Succeeded, // SIMULATED confirmed paid
-            "Failed" => PaymentState.Failed,       // SIMULATED definitive no-effect decline
-            "Timeout" => PaymentState.Unknown,     // SIMULATED ambiguous result
-            _ => throw new InvalidOperationException("MockPsp:Outcome must be Succeeded, Failed or Timeout.")
-        };
-    }
-}
-
+/// <summary>Only this development worker initiates Mock PSP operations.</summary>
 public sealed class PaymentProcessingWorker(
-    NpgsqlPaymentWorkStore store, MockPsp psp, ILogger<PaymentProcessingWorker> logger)
+    NpgsqlPaymentWorkStore store, NpgsqlMockPspLedger provider,
+    IConfiguration configuration, ILogger<PaymentProcessingWorker> logger)
     : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        using var tick = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         do
         {
             try
             {
-                // An expired claim might already have caused an external PSP side effect;
-                // move to UNKNOWN, NOT back to the Pending queue.
-                if (await store.MarkOneExpiredClaimUnknownAsync(stoppingToken))
-                    continue;
+                if (await store.MarkOneExpiredClaimUnknownAsync(ct)) continue;
+                var claim = await store.ClaimPendingAsync(ct);
+                if (claim is null) continue;
 
-                var attempt = await store.ClaimPendingAsync(stoppingToken);
-                if (attempt is null)
-                    continue;
+                var configured = configuration["MockPsp:Outcome"] ?? "Succeeded";
+                if (!Enum.TryParse<MockPspBehavior>(configured, ignoreCase: true, out var behavior))
+                    throw new InvalidOperationException("Unknown local mock PSP mode: " + configured);
 
-                var simulatedOutcome = await psp.InitiateAsync(attempt, stoppingToken);
-                var committed = await store.CompleteAsync(attempt, simulatedOutcome, stoppingToken);
-                if (!committed)
-                    logger.LogWarning("Attempt {AttemptId} claim was superseded; no repeat call.", attempt.AttemptId);
+                // Provider may COMMIT its simulated effect, then return Unknown.
+                // This is a separate short PostgreSQL transaction from gateway state.
+                var outcome = await provider.InitiateAsync(claim.ProviderOperationKey, behavior, ct);
+                var committed = await store.CompleteAsync(claim, outcome, ct);
+                if (committed)
+                    logger.LogInformation("Mock PSP attempt {AttemptId}, payment {PaymentId}: {Outcome}",
+                        claim.AttemptId, claim.PaymentId, outcome);
                 else
-                    logger.LogInformation("Demo payment {PaymentId}: {Outcome}", attempt.PaymentId, simulatedOutcome);
+                    logger.LogWarning("Stale attempt claim {AttemptId}; will not repeat PSP initiation", claim.AttemptId);
             }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { break; }
             catch (Exception ex)
             {
-                // Do not reissue the ambiguous PSP attempt here.
-                logger.LogError(ex, "Demo worker iteration failed; processing attempts remain claimed until UNKNOWN recovery.");
+                logger.LogError(ex, "Mock attempt processing failed; uncertain claims are not reissued.");
             }
-        }
-        while (await tick.WaitForNextTickAsync(stoppingToken));
+        } while (await timer.WaitForNextTickAsync(ct));
     }
 }

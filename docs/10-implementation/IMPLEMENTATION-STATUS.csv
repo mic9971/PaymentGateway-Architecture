@@ -16,3 +16,10 @@ RabbitMQ audit consumer,Implemented (Demo),MQ-IT-01 and MQ-IT-02 passed,Not a fi
 RabbitMQ quorum DLQ,Implemented (Demo),No DLQ drill executed,Retry limit and recovery operation not signed off,Run poison-message game day
 Broker outage recovery,Not Run,Not Run,Outbox claim/retry implemented only,Run 5-minute outage and recovery drill
 Implementation Tracker v0.2,Updated,12 tests passed,No E2E real bank proof,https://docs.google.com/spreadsheets/d/1_hs9dEStZ2208wy6APN1e2YX4B4qX0hG/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
+
+Mock PSP separate-effect ledger,Implemented (Demo),REC-01/REC-03 passed,Same database host not true remote PSP,Approve PSP semantics
+Mock PSP read-only inquiry,Implemented (Demo),REC-01/REC-02 passed,No real PSP status-query contract,Finance/PSP review
+Atomic Unknown resolution,Implemented (Demo),REC-04 passed,Only simulated definitive evidence,Review ADR-0018
+Outbox publish failure simulation,Tested (Simulated),MSG-01 passed,5-minute broker outage not executed,Manual game day
+Broker confirm-to-DB mark gap,Tested (Real RabbitMQ),MSG-02 passed,Process kill not executed,Manual game day
+Recovery tracker v0.3,Updated,19 automated tests passed,7 test/evidence items remain Not Run,https://docs.google.com/spreadsheets/d/1OzzZGORlTJ0tEIjk9MTlvAmXjLp2KZDa/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
