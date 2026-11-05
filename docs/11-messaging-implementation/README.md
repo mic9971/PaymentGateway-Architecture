@@ -1,6 +1,6 @@
 # Messaging Implementation — RabbitMQ Outbox/Inbox v0.2
 
-**Status:** Development-only, awaiting CI and architecture review. No real PSP or bank integration.
+**Status:** Development-only; GitHub CI build and 13/13 tests verified (3 unit, 10 PostgreSQL/RabbitMQ integration). Architecture review remains pending. No real PSP or bank integration.
 
 ## Scope of this increment
 
@@ -101,3 +101,10 @@ SELECT count(*) AS inbox_events FROM messaging.consumer_inbox;
 - Approve retry/backoff, dead-letter queue, retention, duplicate-safe consumer contracts.
 - Perform broker stop/restart and crash-after-confirm drills with measured evidence.
 - **Most importantly**: do not let a RabbitMQ consumer create a new PSP payment from a duplicate message without a provider-side idempotency/status inquiry protocol.
+
+## Verified CI evidence (2026-11-05)
+
+- [RabbitMQ Outbox Inbox CI — 13/13 tests passed](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/41983374310).
+- [Implementation Tracker v0.2 (11-sheet Excel)](https://docs.google.com/spreadsheets/d/1_hs9dEStZ2208wy6APN1e2YX4B4qX0hG/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true).
+- Integration tests validate publisher confirms/queue routing, atomic concurrent Inbox, JSON rollback, and **ack-lost → RabbitMQ redelivery → no duplicate Inbox/projection**, alongside existing Payment Core tests.
+- This does **not** mean a 5-minute broker outage game day, DLQ redrive or crash-after-confirm-before-DB-mark has been executed. Those remain unverified gates.
