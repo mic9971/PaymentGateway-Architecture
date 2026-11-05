@@ -85,3 +85,12 @@ Avoid production secrets and customer payment data in this repository.
 - [Verified CI: 3 unit + 16 PostgreSQL/RabbitMQ integration tests passed](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42047986687).
 - This is a **local-only Mock PSP experiment**; no bank account, VietQR, e-wallet or real PSP is called. No real-money exactly-once proof.
 - Branch `feature/payment-recovery-fault-injection` should only enter the existing PR stack after explicit owner approval; `develop` and `main` remain untouched.
+
+## PSP Webhook Security & Reconciliation v0.4 (Draft PR #5)
+
+- [Webhook/reconciliation implementation guide and context boundaries](docs/13-psp-webhook-reconciliation/README.md).
+- [Proposed ADR-0019](docs/04-solution-proposal/adrs/ADR-0019-verified-webhook-reconciliation.md).
+- [Implementation Tracker v0.4 (21-sheet Excel)](https://docs.google.com/spreadsheets/d/1-KWKpiXq7nJyy0ItsacSh-tJRvRXy8OE/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true) — prior 15 sheets preserved + six new status, security, reconciliation, tests and gate tabs.
+- [Verified GitHub Actions CI: 25/25 tests](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42054657420) — 3 unit + 22 PostgreSQL/RabbitMQ integration tests.
+- **Development-only Mock PSP HMAC**; no real provider key, production merchant authentication, bank statements, or funds movement.
+- Branch `feature/psp-webhook-reconciliation` is based on recovery Draft PR #4. No merge to any parent branch, `develop` or `main` without explicit approval.
