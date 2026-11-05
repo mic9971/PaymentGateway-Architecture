@@ -1,0 +1,13 @@
+Decision_ID,Decision,Owner,Approval,Evidence
+DEC-001,Funds custody and legal boundary,Sponsor+Finance+Legal,Not confirmed,Money flow and signed scope
+DEC-002,Merchant tenancy and identity,Product Owner,Not confirmed,Merchant personas and tenancy model
+DEC-003,VietQR QR creation and confirmation partner,PSP Lead,Not confirmed,Bank/PSP contract and webhook sample
+DEC-004,Wallet and PSP selection,Product+PSP Lead,Not confirmed,Provider contracts and sandbox
+DEC-005,Checkout sync vs async,Product Owner,Not confirmed,UX journey signoff
+DEC-006,Routing and safe failover rules,Architect+PSP Lead,Not confirmed,PSP status inquiry + retry contract
+DEC-007,Refund responsibility,Finance+PSP Lead,Not confirmed,Refund policy
+DEC-008,Settlement responsibility,Sponsor+Finance+Legal,Not confirmed,Payout contract
+DEC-009,Reconciliation authority and SLA,Finance,Not confirmed,"Sample statements, matching rules"
+DEC-010,10k/day metric and peak distribution,Product+SRE,Not confirmed,Traffic model
+DEC-011,Card data and compliance scope,Security+Legal,Not confirmed,"Data flow, compliance assessment"
+DEC-012,Runtime platform and technology choices,Architecture Review Board,Not confirmed,Alternative ADRs and cost

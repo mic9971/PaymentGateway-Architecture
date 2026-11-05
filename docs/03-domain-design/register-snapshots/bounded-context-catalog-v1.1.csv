@@ -1,0 +1,9 @@
+BC_ID,Bounded_Context,Classification,Primary_Capability,Write_Owner,Public_Contract,Status
+BC-01,Merchant,Supporting,Merchant onboarding and auth policy,merchant.*,MerchantProfile,Proposed
+BC-02,Payment,Core,PaymentIntent/Attempt state and idempotency,payment.*,CreatePayment;PaymentStatusChanged,Proposed
+BC-03,Routing,Supporting/Core TBD,PSP selection/routing evidence,routing.*,SelectProvider,Needs Confirmation
+BC-04,Provider Integration,Supporting/ACL,Partner contract translation and webhook evidence,integration.*,ExecuteAttempt;ProviderOutcomeVerified,Needs Confirmation
+BC-05,Refund,Supporting,Refund and refundable budget invariant,refund.* candidate,RequestRefund;RefundStatusChanged,Needs Confirmation
+BC-06,Reconciliation,Core/Supporting TBD,Provider statement matching and discrepancy,reconciliation.*,VerifiedOutcomeEvidence,Needs Confirmation
+BC-07,Notifications,Generic,Merchant outbound webhook delivery,notification.*,DeliveryResult,Proposed
+BC-08,Audit & Operations,Supporting boundary TBD,"Investigation, audit evidence and privileged cases",audit.*;operations.* candidate,OpenInvestigation,Needs Confirmation

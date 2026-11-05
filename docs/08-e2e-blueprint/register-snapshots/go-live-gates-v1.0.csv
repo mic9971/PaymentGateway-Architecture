@@ -1,0 +1,10 @@
+Gate,Acceptance,Owner,Evidence,Status
+GATE-D1,Business boundary signed,Sponsor+Finance+Legal,Money-flow and scope,Needs Confirmation
+GATE-DDD,Context/data ownership agreed,Architect/Product,Context map,Proposed
+GATE-ARC,Architecture options & ADR approved,Architecture Board,Proposal,Proposed
+GATE-COR,Financial correctness proven,QA/Finance/PSP,Fault/sandbox test reports,Not Run
+GATE-DATA,DB and messaging reliability reviewed,DBA/Platform,DB/Outbox evidence,Proposed
+GATE-SEC,Security/privacy/compliance approved,Security/Legal,Threat model/test,Needs Confirmation
+GATE-PERF,Approved workload SLO proven,SRE/Sponsor,Load test/cost,Not Run
+GATE-VAL,Architecture conformance proven,Architect/QA,CI,Not Run
+GATE-GO,"UAT, backup, ops, rollback ready",Sponsor/Ops/Finance,Runbooks and acceptance,Not Run

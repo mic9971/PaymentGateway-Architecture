@@ -1,0 +1,12 @@
+ID,From,Trigger,To,CriticalGuard,Test,Status
+ST-01,Created,Internal commit,Pending,Idempotent creation,PC-T01,Proposed
+ST-02,Pending,Durable attempt claim,Processing,CAS/lease,PC-T03,Proposed
+ST-03,Processing,QR generated,RequiresAction,Not proof of payment,PC-T19,Needs Confirmation
+ST-04,Processing/RequiresAction,Verified paid,Succeeded,PSP evidence + business finality,PC-T06,Needs Confirmation
+ST-05,Processing,Definitive no-effect failure,Failed,Contractual no charge proof,PC-T05,Needs Confirmation
+ST-06,Processing,Ambiguous timeout,Unknown,Do not retry charge blindly,PC-T04,Proposed
+ST-07,Unknown,Inquiry confirms paid,Succeeded,Verified stable reference,PC-T08,Needs Confirmation
+ST-08,Unknown,Inquiry proves no-effect,Failed,Provider definitive proof,PC-T08,Needs Confirmation
+ST-09,RequiresAction,QR expired,ExpiredPendingReview,Late transfer policy,PC-T14,Needs Confirmation
+ST-10,Succeeded,Stale failed event,No state change,Prevent regression,PC-T09,Proposed
+ST-11,Failed,Contradictory paid evidence,Investigation,Finance/PSP review,PC-T14,Needs Confirmation

@@ -1,0 +1,15 @@
+ID,Approval_Gate,Owner,Status,Priority
+G-DDD-01,Business capability classification,Product,Needs Confirmation,High
+G-DDD-02,Money movement/custody boundary,Sponsor/Finance/Legal,Needs Confirmation,Critical
+G-DDD-03,Ubiquitous Language terms,Product/Finance,Needs Confirmation,High
+G-DDD-04,PSP/VietQR contractual semantics,PSP Lead,Needs Confirmation,Critical
+G-DDD-05,Atomic Refund authorization,Finance/Architect,Needs Confirmation,Critical
+G-DDD-06,Safe routing/failover policy,Product/PSP,Needs Confirmation,Critical
+G-DDD-07,Reconciliation authority,Finance,Needs Confirmation,Critical
+G-DDD-08,Merchant webhook semantics,Product,Needs Confirmation,Medium
+G-DDD-09,Audit vs Operations context,Ops/Security,Needs Confirmation,Medium
+G-DDD-10,Schema write ownership,Architect/DBA,Needs Confirmation,High
+G-DDD-11,Context mapping approved,Architect,Needs Confirmation,High
+G-DDD-12,DDD dependency fitness functions,Tech Lead,Needs Confirmation,High
+G-DDD-13,MVP module/deployment map,Engineering,Needs Confirmation,High
+G-DDD-14,Invariants linked to tests,QA/Finance,Needs Confirmation,Critical

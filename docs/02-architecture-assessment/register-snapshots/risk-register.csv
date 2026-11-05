@@ -1,0 +1,13 @@
+ID,Scenario,Likelihood_1to5,Impact_1to5,Score,Mitigation,Linked_ID,Status
+R-001,Duplicate PSP charge on retry,3,5,15,Atomic claim + PSP idempotency / inquiry,NFR-001,Open
+R-002,Unknown outcome after provider timeout,4,5,20,UNKNOWN + status inquiry + reconciliation,NFR-002,Open
+R-003,DB commit but MQ publish failure,3,4,12,Transactional Outbox,NFR-010,Open
+R-004,Webhook forgery/replay/order inversion,4,5,20,Signature + dedup + transitions,NFR-006,Open
+R-005,Merchant data leakage,3,5,15,Tenant isolation + auth tests,NFR-006,Open
+R-006,Peak TPS incorrectly inferred,4,4,16,"Confirm workload, load tests",NFR-004,Open
+R-007,Reconciliation mismatch unresolved,3,5,15,Finance escalation + proof trail,NFR-002,Open
+R-008,DB outage with unvalidated restore,3,5,15,Backup/restore and game day,NFR-005,Open
+R-009,Poor index/query/pool tuning,3,3,9,Query plans + metrics,NFR-003,Open
+R-010,Scope creep vs six-month launch,4,4,16,MVP exclusions and roadmap,BR-008,Open
+R-011,PCI scope expansion,3,5,15,Security/legal discovery,NFR-006,Open
+R-012,Cache stale payment status,3,4,12,DB remains authoritative,NFR-001,Open
