@@ -1,6 +1,6 @@
 # Payment Core — Implementation Foundation v0.1
 
-**Status:** New implementation proposal on `feature/payment-core-foundation`; not merged. Build and runtime tests are **not locally verified** because the authoring environment lacks .NET SDK and Docker.
+**Status:** New implementation proposal on `feature/payment-core-foundation`; not merged. Build and tests **are verified by GitHub Actions** (3 unit + 6 PostgreSQL integration tests passed on commit 1729f962). Local build/containers were not executed in the authoring environment because .NET SDK and Docker were unavailable.
 
 ## Scope actually implemented
 
@@ -10,7 +10,7 @@
 - `Gateway.Api`: development-only `POST /v1/payments`, `GET /v1/payments/{id}`, and liveness endpoint.
 - `Gateway.Worker`: development-only deterministic **Mock PSP** executor; no network call or real charges.
 - `deploy/compose`: local PostgreSQL + API + Worker. PostgreSQL schema is a local initialization script, **not** a production migration system.
-- Unit/Integration tests and GitHub Actions: compile/test **must be verified from CI run**, do not infer from committing files.
+- Unit/Integration tests and GitHub Actions: **9/9 tests passed** on the CI runner. This proves only the specifically covered mock/DB cases, not PSP settlement correctness.
 
 ## Explicitly NOT implemented
 
@@ -86,3 +86,11 @@ dotnet test tests/IntegrationTests/Payment.IntegrationTests.csproj -c Release
 - PC-T03/04/11: attempt claims, no blind repeat after crash.
 - PC-T10: Outbox persists in DB but no MQ publish proof yet.
 - ADR-0014/0015 and ADR-0013 remain Proposed. Mock behavior is **not financial correctness evidence**.
+
+## Verified implementation evidence
+
+- **GitHub CI run:** https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/41969726629 — Build succeeded; 3 unit tests and 6 real-PostgreSQL integration tests passed.
+- **Implementation Tracker (.xlsx):** https://docs.google.com/spreadsheets/d/1GSFJbTdbNP5JpYwJWmZccv2A4vSEHo7R/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true — editable feature register, tests, open risks, ADR gates, delivery plan and local runbook.
+- **Commit verified:** `1729f96265eb601efa77dd522c642ee00f358659`.
+- **Not verified:** local Docker Compose smoke, RabbitMQ, real PSP integrations, security/HA/SLO and refund correctness.
+- This implementation tracker is separate from the 64-sheet architecture workbook, so the approved design baseline is not silently overwritten. Excel and GitHub CSVs do not synchronize automatically.
