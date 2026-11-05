@@ -142,7 +142,7 @@ public sealed class RabbitMqOutboxInboxIntegrationTests
         var firstChannel = await conn.CreateChannelAsync();
         try
         {
-            await firstChannel.QueueDeclareAsync(queue: queue, durable: false,
+            await firstChannel.QueueDeclareAsync(queue: queue, durable: true,
                 exclusive: false, autoDelete: false, arguments: null);
 
             await using (var publisher = await PaymentEventTopology.PublisherChannelAsync(conn, CancellationToken.None))
