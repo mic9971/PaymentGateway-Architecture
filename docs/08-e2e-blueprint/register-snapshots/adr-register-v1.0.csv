@@ -1,0 +1,13 @@
+ADR_ID,Decision,Candidate,Owner,Status
+ADR-001,Architecture style,Modular Monolith + workers,Architect,Proposed
+ADR-002,PSP adapter,Provider interface + contracts,PSP Lead,Proposed
+ADR-003,Financial operation persistence,PostgreSQL,DBA,Proposed
+ADR-004,Reliable event publishing,Outbox + RabbitMQ,Platform,Proposed
+ADR-005,Routing,Deterministic rules,Product,Proposed
+ADR-006,Unknown PSP outcome,Inquiry/reconciliation,PSP/Finance,Proposed
+ADR-007,Caching,Redis metadata only,Architect,Proposed
+ADR-008,Multi-region,Evaluate single-region HA first,SRE,Needs Confirmation
+ADR-009,Runtime,Supported LTS for production,Engineering,Needs Confirmation
+ADR-010,Partitioning,Defer until workload evidence,DBA,Proposed
+ADR-011,Refund,Separate workflow/state machine,Finance,Proposed
+ADR-012,Merchant isolation,Tenant auth + audit,Security,Proposed

@@ -49,3 +49,11 @@ The three v0.1 Excel workbooks below are the **baseline references**. Product Di
 - **GitHub review snapshots:** [Decision Board](../01-requirement-discovery/register-snapshots/decision-board-v0.2.csv), [Failure Cases](../06-architecture-validation/register-snapshots/failure-acceptance-v0.2.csv).
 
 Do not modify old v0.1 files in place without explicit version-control intent. Excel and CSV snapshots are not automatically synchronized.
+
+## Current end-to-end architecture workbook (v1.0)
+
+- [**PaymentGateway_E2E_Architecture_Product_Pack_v1.0.xlsx**](https://docs.google.com/spreadsheets/d/1d4ab3DIkGC_BYZUiJ34SSCEWjXENAC8U/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true) — 42 tabs: 15 Day 1 tabs preserved + 27 additional E2E tabs.
+- [GitHub E2E Blueprint](../08-e2e-blueprint/README.md) — diagrams, requirements traceability, architecture proposal, correctness, data, security, capacity, cost, tests and delivery.
+- **Status:** Draft / pending customer, PSP, Finance, Legal, Security, SRE and architecture approvals.
+- Workbook is stored as original **.xlsx** on Google Drive. GitHub contains readable Markdown and CSV snapshots. GitHub CSV snapshots are *not* automatically synchronized to the workbook.
+- The previous 3 workbook files and Product Discovery v0.2 remain for historical comparison; do not overwrite them by assumption.
