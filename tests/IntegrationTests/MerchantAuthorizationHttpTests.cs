@@ -65,6 +65,8 @@ public sealed class MerchantAuthorizationHttpTests : IClassFixture<MerchantAutho
         using var client=factory.CreateClient();
         var merchant=Guid.NewGuid();
         var other=Guid.NewGuid();
+        await RegisterAsync(merchant);
+        await RegisterAsync(other);
         using var create=Request(HttpMethod.Post,"/v1/payments",
             Token(merchant,"payments:create"),PaymentBody());
         create.Headers.Add("X-Demo-Merchant-Id",other.ToString("D"));
@@ -87,6 +89,8 @@ public sealed class MerchantAuthorizationHttpTests : IClassFixture<MerchantAutho
         using var client=factory.CreateClient();
         var merchant=Guid.NewGuid();
         var other=Guid.NewGuid();
+        await RegisterAsync(merchant);
+        await RegisterAsync(other);
         using var payRequest=Request(HttpMethod.Post,"/v1/payments",
             Token(merchant,"payments:create"),PaymentBody());
         var payResponse=await client.SendAsync(payRequest);
@@ -167,7 +171,8 @@ public sealed class MerchantAuthorizationHttpTests : IClassFixture<MerchantAutho
             .TrimEnd('=').Replace('+','-').Replace('/','_');
         var now=DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var claims=new Dictionary<string,object>{
-            ["iss"]=issuer,["aud"]=audience,["sub"]="local-merchant-client",
+            ["iss"]=issuer,["aud"]=audience,
+            ["sub"]=SubjectFor(merchant),["client_id"]="local-demo-client",
             ["iat"]=now-120,["nbf"]=now-120,["exp"]=now+(expired?-30:600),
             ["jti"]=Guid.NewGuid().ToString("D"),["scope"]=scope
         };
@@ -176,6 +181,117 @@ public sealed class MerchantAuthorizationHttpTests : IClassFixture<MerchantAutho
             "."+B64(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(claims)));
         return input+"."+B64(HMACSHA256.HashData(
             Encoding.UTF8.GetBytes(Secret),Encoding.UTF8.GetBytes(input)));
+    }
+
+
+    private static string SubjectFor(Guid? id) =>
+        id is Guid merchant ? "merchant-" + merchant.ToString("N") : "missing-merchant";
+
+    private static async Task RegisterAsync(Guid merchant, string[]? scopes=null)
+    {
+        if(Pg is null)return;
+        await using var source=NpgsqlDataSource.Create(Pg);
+        await using var conn=await source.OpenConnectionAsync();
+        await using var tx=await conn.BeginTransactionAsync();
+        await using(var m=new NpgsqlCommand("""
+            INSERT INTO iam.merchants(merchant_id,status)
+            VALUES (@id,'Active') ON CONFLICT(merchant_id)
+            DO UPDATE SET status='Active',updated_at=now()
+            """,conn,tx)){
+            m.Parameters.AddWithValue("id",merchant);
+            await m.ExecuteNonQueryAsync();
+        }
+        await using(var client=new NpgsqlCommand("""
+            INSERT INTO iam.merchant_clients
+              (merchant_id,issuer,subject,client_id,granted_scopes,enabled)
+            VALUES (@id,@issuer,@subject,@client,@scopes,true)
+            ON CONFLICT (merchant_id,issuer,subject,client_id)
+            DO UPDATE SET enabled=true,granted_scopes=EXCLUDED.granted_scopes,
+                          updated_at=now()
+            """,conn,tx)){
+            client.Parameters.AddWithValue("id",merchant);
+            client.Parameters.AddWithValue("issuer","https://merchant-auth.local.test");
+            client.Parameters.AddWithValue("subject",SubjectFor(merchant));
+            client.Parameters.AddWithValue("client","local-demo-client");
+            client.Parameters.AddWithValue("scopes",NpgsqlTypes.NpgsqlDbType.Array|
+                NpgsqlTypes.NpgsqlDbType.Text,
+                scopes ?? ["payments:create","payments:read","refunds:create","refunds:read"]);
+            await client.ExecuteNonQueryAsync();
+        }
+        await tx.CommitAsync();
+    }
+
+    [Fact]
+    public async Task SuspendedMerchant_ExistingUnexpiredJwt_CannotCreatePayment()
+    {
+        if(Pg is null)return;
+        var merchant=Guid.NewGuid();
+        await RegisterAsync(merchant);
+        var jwt=Token(merchant,"payments:create");
+        using var client=factory.CreateClient();
+        using(var valid=Request(HttpMethod.Post,"/v1/payments",jwt,PaymentBody()))
+            Assert.Equal(HttpStatusCode.Accepted,(await client.SendAsync(valid)).StatusCode);
+
+        await using(var source=NpgsqlDataSource.Create(Pg))
+        await using(var connection=await source.OpenConnectionAsync())
+        await using(var cmd=new NpgsqlCommand("""
+            UPDATE iam.merchants SET status='Suspended',updated_at=now()
+            WHERE merchant_id=@id
+            """,connection)){
+            cmd.Parameters.AddWithValue("id",merchant);
+            Assert.Equal(1,await cmd.ExecuteNonQueryAsync());
+        }
+        using var denied=Request(HttpMethod.Post,"/v1/payments",jwt,PaymentBody());
+        Assert.Equal(HttpStatusCode.Forbidden,(await client.SendAsync(denied)).StatusCode);
+    }
+
+    [Fact]
+    public async Task SignedJwtScopeWithoutDbGrant_IsForbidden()
+    {
+        if(Pg is null)return;
+        var merchant=Guid.NewGuid();
+        await RegisterAsync(merchant,["payments:read"]);
+        using var client=factory.CreateClient();
+        using var request=Request(HttpMethod.Post,"/v1/payments",
+            Token(merchant,"payments:create"),PaymentBody());
+        Assert.Equal(HttpStatusCode.Forbidden,(await client.SendAsync(request)).StatusCode);
+    }
+
+    [Fact]
+    public async Task UnregisteredMerchant_WithValidJwt_IsForbidden()
+    {
+        if(Pg is null)return;
+        using var client=factory.CreateClient();
+        var merchant=Guid.NewGuid();
+        using var request=Request(HttpMethod.Post,"/v1/payments",
+            Token(merchant,"payments:create"),PaymentBody());
+        Assert.Equal(HttpStatusCode.Forbidden,(await client.SendAsync(request)).StatusCode);
+    }
+
+    [Fact]
+    public async Task AccessAudit_RecordsStatusWithoutStoringBearerToken()
+    {
+        if(Pg is null)return;
+        var merchant=Guid.NewGuid();
+        await RegisterAsync(merchant);
+        using var client=factory.CreateClient();
+        var jwt=Token(merchant,"payments:create");
+        using(var req=Request(HttpMethod.Post,"/v1/payments",jwt,PaymentBody()))
+            Assert.Equal(HttpStatusCode.Accepted,(await client.SendAsync(req)).StatusCode);
+
+        await using var source=NpgsqlDataSource.Create(Pg);
+        await using var conn=await source.OpenConnectionAsync();
+        await using var query=new NpgsqlCommand("""
+            SELECT http_status,request_path,subject FROM iam.access_audit
+            WHERE merchant_id=@merchant ORDER BY timestamp_utc DESC LIMIT 1
+            """,conn);
+        query.Parameters.AddWithValue("merchant",merchant);
+        await using var rd=await query.ExecuteReaderAsync();
+        Assert.True(await rd.ReadAsync());
+        Assert.Equal(202,rd.GetInt32(0));
+        Assert.Equal("/v1/payments",rd.GetString(1));
+        Assert.StartsWith("merchant-",rd.GetString(2));
+        Assert.DoesNotContain(jwt,rd.GetString(2));
     }
 
     public sealed class ApiFactory:WebApplicationFactory<Program>
