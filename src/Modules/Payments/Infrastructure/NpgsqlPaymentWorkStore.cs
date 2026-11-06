@@ -9,7 +9,14 @@ public sealed record ClaimedAttempt(
 /// <summary>Demo worker claims with PostgreSQL locks; a timed-out claim is UNKNOWN, not auto-retried.</summary>
 public sealed class NpgsqlPaymentWorkStore(NpgsqlDataSource dataSource)
 {
-    public async Task<ClaimedAttempt?> ClaimPendingAsync(CancellationToken ct)
+    public Task<ClaimedAttempt?> ClaimPendingAsync(CancellationToken ct)
+        => ClaimAsync(null,ct);
+
+    // Allows isolated test/operator claim; normal worker still claims the global queue.
+    public Task<ClaimedAttempt?> ClaimPaymentAsync(Guid paymentId,CancellationToken ct)
+        => ClaimAsync(paymentId,ct);
+
+    private async Task<ClaimedAttempt?> ClaimAsync(Guid? targetPaymentId,CancellationToken ct)
     {
         await using var conn = await dataSource.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
@@ -18,6 +25,7 @@ public sealed class NpgsqlPaymentWorkStore(NpgsqlDataSource dataSource)
             WITH candidate AS (
                 SELECT attempt_id FROM payment.payment_attempts
                 WHERE state = 'Pending'
+                  AND (@payment_filter IS NULL OR payment_id=@payment_filter)
                 ORDER BY created_at, attempt_id
                 LIMIT 1 FOR UPDATE SKIP LOCKED
             )
@@ -29,6 +37,8 @@ public sealed class NpgsqlPaymentWorkStore(NpgsqlDataSource dataSource)
             RETURNING a.attempt_id, a.payment_id, a.provider_operation_key
             """, conn, tx);
         claim.Parameters.AddWithValue("claim", claimId);
+        claim.Parameters.AddWithValue("payment_filter",NpgsqlTypes.NpgsqlDbType.Uuid,
+            (object?)targetPaymentId ?? DBNull.Value);
         Guid attemptId;
         Guid paymentId;
         string providerKey;
