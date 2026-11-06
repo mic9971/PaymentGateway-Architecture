@@ -112,3 +112,13 @@ Avoid production secrets and customer payment data in this repository.
 - [GitHub Actions verified 38/38 tests: 3 unit + 35 integration](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42158393241).
 - Signed, expiring JWT with `merchant_id` and payment/refund scopes replaces spoofable `X-Demo-Merchant-Id`. Real OIDC/JWKS and merchant onboarding remain **Not Implemented**.
 - Branch `feature/merchant-identity-authorization` targets `feature/refund-budget-concurrency`. **Draft review only; do not merge**.
+
+## Merchant Registry Security Hardening v0.7 (Draft PR #8)
+
+- [IAM registry design, status/grant enforcement and audit runbook](docs/16-merchant-hardening/README.md).
+- [Proposed ADR-0022](docs/04-solution-proposal/adrs/ADR-0022-merchant-registry-oidc.md).
+- [Implementation Tracker v0.7 — 39 Excel sheets](https://docs.google.com/spreadsheets/d/13JwYvpAZ4uXQlO6usEmFBFJj44VcyEZw/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true); prior 33 tabs preserved plus six IAM/security review tabs.
+- [Verified CI: **42/42 passed (3 unit + 39 PostgreSQL/RabbitMQ/HTTP integration tests)**](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42160759634).
+- Live registry grants are checked alongside JWT claims; merchant suspension takes effect before JWT expiration. Local SQL fixtures only — no real OIDC connection.
+- HTTP audit is **best effort**, not tamper-proof financial proof. The API remains MOCK-only and Development-locked.
+- `feature/merchant-security-hardening` → `feature/merchant-identity-authorization`. **Draft only; do not merge**.

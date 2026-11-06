@@ -39,8 +39,9 @@ def main() -> None:
         parser.error("Set MERCHANT_DEV_JWT_KEY (32+ UTF-8 bytes) in local environment")
     now = int(time.time())
     header = {"alg": "HS256", "typ": "JWT"}
-    payload = {"iss": ISS, "aud": AUD, "sub": "local-demo-merchant-client",
+    payload = {"iss": ISS, "aud": AUD, "sub": "merchant-" + uuid.UUID(merchant).hex,
                "merchant_id": merchant, "scope": " ".join(scopes),
+               "client_id": "local-demo-client",
                "iat": now, "nbf": now, "exp": now + a.lifetime,
                "jti": str(uuid.uuid4())}
     data = b64(json.dumps(header, separators=(",", ":")).encode()) + "." + \

@@ -28,6 +28,7 @@ builder.Services.AddSingleton(new MockWebhookSecret(System.Text.Encoding.UTF8.Ge
 
 var app = builder.Build();
 app.UseAuthentication();
+app.UseMiddleware<MerchantSecurityAuditMiddleware>();
 app.UseAuthorization();
 
 app.MapGet("/health/live", () => Results.Ok(new { status = "live", demo = true })).AllowAnonymous();

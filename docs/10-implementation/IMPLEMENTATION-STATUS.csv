@@ -45,3 +45,10 @@ Refund create/read scope policies,Verified in CI,HTTP-AT-03 HTTP-AT-05 passed,Hi
 PSP HMAC vs merchant JWT separation,Verified in CI,HTTP-AT-06 passed,Real provider signatures unknown,PSP contract
 Production OIDC/JWKS,Not Implemented,Not Run,Local HS256 key is development-only,Choose external issuer
 Identity Tracker v0.6,Updated,38 tests passed,11 security approval gates remain open,https://docs.google.com/spreadsheets/d/1h6KVganNNwQRahJR6ZTwI0HemtXZ1-hr/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
+
+Merchant registry active and client-scoped grant,Implemented Demo,IAM-T07 IAM-T08 IAM-T09 passed,No production enrollment/IdP,Security/IAM review
+Live suspension on unexpired JWT,Verified in CI,IAM-T07 passed,IdP-side token revocation still open,Security review
+Deny unregistered merchant even with valid JWT,Verified in CI,IAM-T09 passed,Registry becomes online DB dependency,SRE capacity tests
+HTTP access audit,Implemented Best Effort,IAM-T10 passed,Not financial immutable audit,Compliance design
+Opt-in OIDC JWKS validation,Proposed,Not Run,No live IdP or key rotation,Identity Provider decision
+Security tracker v0.7,Updated,42 tests passed,Production identity/financial gates open,https://docs.google.com/spreadsheets/d/13JwYvpAZ4uXQlO6usEmFBFJj44VcyEZw/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true

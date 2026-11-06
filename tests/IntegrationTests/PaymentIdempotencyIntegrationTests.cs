@@ -85,9 +85,9 @@ public sealed class PaymentIdempotencyIntegrationTests
         var worker = new NpgsqlPaymentWorkStore(ds);
 
         // Worker processes global pending queue; repeated claims cannot claim the same attempt.
-        var claimed = await worker.ClaimPendingAsync(CancellationToken.None);
+        var claimed = await worker.ClaimPaymentAsync(created.Payment.PaymentId, CancellationToken.None);
         Assert.NotNull(claimed);
-        var secondClaim = await worker.ClaimPendingAsync(CancellationToken.None);
+        var secondClaim = await worker.ClaimPaymentAsync(created.Payment.PaymentId, CancellationToken.None);
         Assert.True(claimed!.AttemptId != secondClaim?.AttemptId);
 
         var completed = await worker.CompleteAsync(claimed, PaymentGateway.Payments.Domain.PaymentState.Unknown, CancellationToken.None);
