@@ -10,11 +10,11 @@ This increment supplements the existing JWT bearer validation with PostgreSQL-bo
 
 ## Architectural context map
 
-- **IAM / Merchant Registry (supporting bounded context):** owns \`iam.merchants\`, \`iam.merchant_clients\`, active/suspended/closed lifecycle and allowed operation scopes.
+- **IAM / Merchant Registry (supporting bounded context):** owns `iam.merchants`, `iam.merchant_clients`, active/suspended/closed lifecycle and allowed operation scopes.
 - **Payment (core):** trusts only a principal that passed issuer/signature/lifetime validation AND the live IAM registry grant check. Tenant ownership still enforced in SQL.
-- **Refund (supporting/core financial capability):** same tenant binding; refund requests additionally require \`refunds:create\`, but high-value approval/dual-control is NOT implemented.
+- **Refund (supporting/core financial capability):** same tenant binding; refund requests additionally require `refunds:create`, but high-value approval/dual-control is NOT implemented.
 - **Provider Integration (anti-corruption layer):** Mock PSP callbacks use HMAC independent of merchant JWT.
-- **Security Audit (technical):** HTTP access telemetry in \`iam.access_audit\` is best-effort, not tamper-proof or atomically committed with Payment/Refund.
+- **Security Audit (technical):** HTTP access telemetry in `iam.access_audit` is best-effort, not tamper-proof or atomically committed with Payment/Refund.
 
 ## HTTP authorization flow
 
@@ -36,9 +36,9 @@ Every scoped merchant route checks live registry. No caching was added; **latenc
 
 ## Supported local modes
 
-**DevelopmentHmac (default):** local HS256 key, issuer \`https://merchant-auth.local.test\` and audience \`paymentgateway.mock.api\`. Local mint script now includes \`sub="merchant-<UUID hex>"\` and \`client_id="local-demo-client"\` to match registry. This is not a production token issuer.
+**DevelopmentHmac (default):** local HS256 key, issuer `https://merchant-auth.local.test` and audience `paymentgateway.mock.api`. Local mint script now includes `sub="merchant-<UUID hex>"` and `client_id="local-demo-client"` to match registry. This is not a production token issuer.
 
-**Oidc (configuration candidate):** set \`MerchantAuth:Mode=Oidc\` plus HTTPS \`Authority\`, trusted \`Issuer\`, and expected \`Audience\`. ASP.NET Core JwtBearer is configured for HTTPS discovery and RS256 JWKS signatures; it still **refuses to run outside Development**. It has not been exercised with a real identity provider or live JWKS. Real provider claim mapping, \`client_id\`/authorized-party semantics, rotation, outage and metadata validation must be tested and approved before adoption.
+**Oidc (configuration candidate):** set `MerchantAuth:Mode=Oidc` plus HTTPS `Authority`, trusted `Issuer`, and expected `Audience`. ASP.NET Core JwtBearer is configured for HTTPS discovery and RS256 JWKS signatures; it still **refuses to run outside Development**. It has not been exercised with a real identity provider or live JWKS. Real provider claim mapping, `client_id`/authorized-party semantics, rotation, outage and metadata validation must be tested and approved before adoption.
 
 Vendor references:
 - https://learn.microsoft.com/en-us/aspnet/core/security/authentication/configure-jwt-bearer-authentication?view=aspnetcore-10.0
@@ -46,7 +46,7 @@ Vendor references:
 
 ## Development runbook
 
-1. From \`deploy/compose\`, start the existing local mock stack using the v0.6 instructions. For **existing** PostgreSQL volumes, apply the new migration:
+1. From `deploy/compose`, start the existing local mock stack using the v0.6 instructions. For **existing** PostgreSQL volumes, apply the new migration:
 
 ~~~bash
 docker compose exec -T postgres psql -U payment_demo -d payment_demo \
@@ -70,7 +70,7 @@ VALUES ('11111111-1111-4111-8111-111111111111',
         true);
 ~~~
 
-3. Export \`MERCHANT_DEV_JWT_KEY\` in your local shell with the **same local-only value** configured in Docker Compose. Mint a short-lived token from the repository root:
+3. Export `MERCHANT_DEV_JWT_KEY` in your local shell with the **same local-only value** configured in Docker Compose. Mint a short-lived token from the repository root:
 
 ~~~bash
 python3 scripts/security/mint_mock_merchant_jwt.py \
@@ -78,9 +78,9 @@ python3 scripts/security/mint_mock_merchant_jwt.py \
   --scopes 'payments:create payments:read refunds:create refunds:read'
 ~~~
 
-**Correction for actual use:** the valid refund scope string is \`refunds:create\`, not \`refundss:create\`; command above deliberately illustrates that invalid scopes are rejected by the mint script. Use \`--scopes 'payments:create payments:read refunds:create refunds:read'\` for authorized demo calls.
+The script only mints a local demo token; client registration and grants must already exist in the database.
 
-4. Create a Mock payment using \`Authorization: Bearer $TOKEN\`. Without a matching registration/grant expect 403; no signed token gives 401.
+4. Create a Mock payment using `Authorization: Bearer $TOKEN`. Without a matching registration/grant expect 403; no signed token gives 401.
 
 5. Suspend the merchant with a local SQL update, then reuse the **same unexpired token**:
 
@@ -89,7 +89,7 @@ UPDATE iam.merchants SET status='Suspended',updated_at=now()
 WHERE merchant_id='11111111-1111-4111-8111-111111111111';
 ~~~
 
-Expected: 403 for a new payment/refund request, even though the JWT signature and \`exp\` remain valid. Re-enable only for approved local testing.
+Expected: 403 for a new payment/refund request, even though the JWT signature and `exp` remain valid. Re-enable only for approved local testing.
 
 6. Inspect authorization telemetry:
 
@@ -103,7 +103,7 @@ No raw bearer token is stored in this table; audit insertion failures are logged
 
 ## CI and acceptance
 
-New integration tests: \`IAM-T07\` suspended merchant denied with same JWT, \`IAM-T08\` JWT scope without DB grant, \`IAM-T09\` unregistered merchant denied, \`IAM-T10\` HTTP audit row after accepted Mock payment.
+[Verified CI: 42/42 tests passed (3 unit + 39 integration)](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42160759634). New integration tests: `IAM-T07` merchant suspension, `IAM-T08` DB grant intersection, `IAM-T09` unregistered merchant denied, `IAM-T10` HTTP audit of a successful Mock payment.
 
 Also fixed a previously exposed NpgsqlDataReader disposal bug in an empty Payment Worker claim path and scoped that integration test by PaymentId instead of selecting unrelated pending jobs. Test success status is based on the linked GitHub Actions run, not on document publication.
 
