@@ -75,7 +75,7 @@ VALUES ('11111111-1111-4111-8111-111111111111',
 ~~~bash
 python3 scripts/security/mint_mock_merchant_jwt.py \
   --merchant 11111111-1111-4111-8111-111111111111 \
-  --scopes 'payments:create payments:read refundss:create'
+  --scopes 'payments:create payments:read refunds:create refunds:read'
 ~~~
 
 **Correction for actual use:** the valid refund scope string is \`refunds:create\`, not \`refundss:create\`; command above deliberately illustrates that invalid scopes are rejected by the mint script. Use \`--scopes 'payments:create payments:read refunds:create refunds:read'\` for authorized demo calls.
@@ -121,4 +121,4 @@ Also fixed a previously exposed NpgsqlDataReader disposal bug in an empty Paymen
 
 - [ADR-0022 — Merchant registry and optional OIDC](../04-solution-proposal/adrs/ADR-0022-merchant-registry-oidc.md)
 - [IAM security gates](./IAM-GATES.csv)
-- Implementation Tracker v0.7: the 33 prior sheets plus six new IAM review sheets.
+- [Implementation Tracker v0.7 — 39 sheets](https://docs.google.com/spreadsheets/d/13JwYvpAZ4uXQlO6usEmFBFJj44VcyEZw/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true): the 33 prior sheets plus six new IAM review sheets.
