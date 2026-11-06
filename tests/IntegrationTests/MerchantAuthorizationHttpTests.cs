@@ -180,6 +180,17 @@ public sealed class MerchantAuthorizationHttpTests : IClassFixture<MerchantAutho
 
     public sealed class ApiFactory:WebApplicationFactory<Program>
     {
+        public ApiFactory()
+        {
+            // Minimal hosting reads builder.Configuration during top-level Program.
+            // Seed TEST-PROCESS environment before the application factory starts it.
+            Environment.SetEnvironmentVariable("MerchantAuth__DevSigningKey", Secret);
+            Environment.SetEnvironmentVariable("MockPsp__WebhookSecret",
+                "ci-local-webhook-secret-not-real");
+            if (Pg is not null)
+                Environment.SetEnvironmentVariable("ConnectionStrings__Payments", Pg);
+        }
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Development");
