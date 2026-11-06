@@ -3,13 +3,13 @@ using PaymentGateway.Payments.Application;
 using PaymentGateway.Payments.Infrastructure;
 using PaymentGateway.Refunds.Application;
 using PaymentGateway.Refunds.Infrastructure;
+using PaymentGateway.Gateway.Api.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// SECURITY BOUNDARY: This tutorial uses a deliberately fake local merchant identity.
-// Do not allow startup outside Development until real merchant authentication is implemented.
-if (!builder.Environment.IsDevelopment())
-    throw new InvalidOperationException("Demo-only API. Configure real merchant authentication before non-development deployment.");
+// Authentication now validates signed and expiring merchant-scoped JWT access tokens.
+// Still MOCK-only, and non-Development deployments remain forbidden.
+builder.Services.AddMerchantAuthentication(builder.Configuration, builder.Environment);
 
 var connectionString = builder.Configuration.GetConnectionString("Payments")
     ?? throw new InvalidOperationException("ConnectionStrings:Payments must be configured.");
@@ -27,14 +27,16 @@ if (System.Text.Encoding.UTF8.GetByteCount(webhookSecret) < 16)
 builder.Services.AddSingleton(new MockWebhookSecret(System.Text.Encoding.UTF8.GetBytes(webhookSecret)));
 
 var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapGet("/health/live", () => Results.Ok(new { status = "live", demo = true }));
+app.MapGet("/health/live", () => Results.Ok(new { status = "live", demo = true })).AllowAnonymous();
 
 app.MapPost("/v1/payments", async (
     HttpContext http, CreatePaymentRequest request, PaymentService service, CancellationToken ct) =>
 {
-    if (!TryGetLocalDemoMerchant(http, out var merchantId))
-        return Results.Unauthorized();
+    if (!MerchantJwtAuthentication.TryGetMerchantId(http.User, out var merchantId))
+        return Results.Forbid();
 
     var key = http.Request.Headers["Idempotency-Key"].ToString();
     try
@@ -56,19 +58,19 @@ app.MapPost("/v1/payments", async (
     {
         return Results.BadRequest(new { error = e.Message });
     }
-});
+}).RequireAuthorization("payments:create");
 
 app.MapGet("/v1/payments/{paymentId:guid}", async (
     HttpContext http, Guid paymentId, PaymentService service, CancellationToken ct) =>
 {
-    if (!TryGetLocalDemoMerchant(http, out var merchantId))
-        return Results.Unauthorized();
+    if (!MerchantJwtAuthentication.TryGetMerchantId(http.User, out var merchantId))
+        return Results.Forbid();
     var payment = await service.GetAsync(merchantId, paymentId, ct);
     return payment is null
         ? Results.NotFound()
         : Results.Ok(new PaymentResponse(payment.PaymentId, payment.MerchantReference,
             payment.AmountMinor, payment.Currency, payment.PaymentMethod, payment.State.ToString(), false));
-});
+}).RequireAuthorization("payments:read");
 
 
 app.MapPost("/v1/providers/mock/webhook", async (
@@ -105,15 +107,15 @@ app.MapPost("/v1/providers/mock/webhook", async (
         MockWebhookDisposition.ConflictingFinal => Results.Accepted(value: new { disposition = "ConflictingFinal", investigation_required = true }),
         _ => Results.Ok(new { disposition = result.ToString() })
     };
-});
+}).AllowAnonymous(); // Authenticity enforced by the distinct PSP-HMAC scheme, not merchant JWT.
 
 
 app.MapPost("/v1/payments/{paymentId:guid}/refunds", async (
     HttpContext http, Guid paymentId, CreateRefundRequest request,
     RefundService service, CancellationToken ct) =>
 {
-    if (!TryGetLocalDemoMerchant(http, out var merchantId))
-        return Results.Unauthorized();
+    if (!MerchantJwtAuthentication.TryGetMerchantId(http.User, out var merchantId))
+        return Results.Forbid();
     var key = http.Request.Headers["Idempotency-Key"].ToString();
     try
     {
@@ -128,26 +130,19 @@ app.MapPost("/v1/payments/{paymentId:guid}/refunds", async (
     catch (RefundConflictException e) { return Results.Conflict(new {error=e.Message}); }
     catch (PaymentNotRefundableException e) { return Results.Conflict(new {error=e.Message}); }
     catch (ArgumentException e) { return Results.BadRequest(new {error=e.Message}); }
-});
+}).RequireAuthorization("refunds:create");
 app.MapGet("/v1/refunds/{refundId:guid}", async (
     HttpContext http, Guid refundId, RefundService service, CancellationToken ct) =>
 {
-    if (!TryGetLocalDemoMerchant(http, out var merchantId))
-        return Results.Unauthorized();
+    if (!MerchantJwtAuthentication.TryGetMerchantId(http.User, out var merchantId))
+        return Results.Forbid();
     var r=await service.GetAsync(merchantId,refundId,ct);
     return r is null?Results.NotFound()
         :Results.Ok(new RefundResponse(r.RefundId,r.PaymentId,r.AmountMinor,
             r.Currency,r.State.ToString(),false));
-});
+}).RequireAuthorization("refunds:read");
 
 app.Run();
-
-static bool TryGetLocalDemoMerchant(HttpContext http, out Guid merchantId)
-{
-    // NOT authentication. Enabled ONLY under Development startup guard and local port binding.
-    var raw = http.Request.Headers["X-Demo-Merchant-Id"].ToString();
-    return Guid.TryParse(raw, out merchantId) && merchantId != Guid.Empty;
-}
 
 public sealed record CreatePaymentRequest(string MerchantReference, long AmountMinor, string Currency, string PaymentMethod);
 public sealed record PaymentResponse(
@@ -159,3 +154,6 @@ public sealed record MockWebhookSecret(byte[] Value);
 
 public sealed record CreateRefundRequest(long AmountMinor);
 public sealed record RefundResponse(Guid RefundId,Guid PaymentId,long AmountMinor,string Currency,string Status,bool Replayed);
+
+// Required for WebApplicationFactory integration tests without exposing a token-mint endpoint.
+public partial class Program { }

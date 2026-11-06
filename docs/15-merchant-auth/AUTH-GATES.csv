@@ -1,0 +1,12 @@
+ID,Decision,Owner,Status,Evidence
+AUTH-G01,Real external OIDC issuer + trusted JWKS,Security/IAM,Needs Confirmation,IdP documentation
+AUTH-G02,Merchant onboarding/suspension and token mapping,Product/IAM,Needs Confirmation,Merchant registry
+AUTH-G03,Signed token HTTP validation,QA,Passed in Mock CI,HTTP-AT-02
+AUTH-G04,Payment and refund tenant resource isolation,QA/Security,Passed in Mock CI,HTTP-AT-04/05
+AUTH-G05,High-value refund approval/fraud limits,Finance/Security,Not Implemented,Policy/4-eyes tests
+AUTH-G06,Token replay/revocation and rate limiting,Security/SRE,Not Implemented,Threat model
+AUTH-G07,PSP HMAC independent from merchant JWT,Security/PSP,Mock only,PSP contract
+AUTH-G08,TLS/mTLS infrastructure and secure key storage,Platform/SRE,Not Run,Infra review
+AUTH-G09,Financial action principal and scope audit,Finance/Audit,Not Implemented,Audit evidence
+AUTH-G10,IdP outage/key rotation incident response,SRE/Security,Not Run,Game day
+AUTH-G11,No Mock PSP or demo JWT for real money,Architecture Board,Open,Go-live review

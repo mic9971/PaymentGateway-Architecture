@@ -42,6 +42,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       MockPsp__WebhookSecret: "${MOCK_WEBHOOK_SECRET:?Set MOCK_WEBHOOK_SECRET in .env}"
+      MerchantAuth__DevSigningKey: "${MERCHANT_DEV_JWT_KEY:?Set MERCHANT_DEV_JWT_KEY in .env}"
       ConnectionStrings__Payments: "Host=postgres;Port=5432;Database=payment_demo;Username=payment_demo;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env};Pooling=true"
     ports:
       - "127.0.0.1:8080:8080"

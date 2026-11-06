@@ -37,3 +37,11 @@ Mock refund worker and status inquiry,Verified in CI,RF-T04 RF-T05 RF-T06 RF-T07
 Refund unknown reservation guard,Verified in CI,RF-T05 RF-T06 passed,Manual escalation incomplete,Finance Ops runbook
 Refund integration events and audit projection,Implemented (Demo),Mock outbox code,Contract and fault tests not complete,Messaging ADR
 Refund Tracker v0.5,Updated,32 automated tests passed,10 refund review gates remain open,https://docs.google.com/spreadsheets/d/1-bvaLzSISmrZNTg27gQIVRS4us8xEYxo/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
+
+Merchant JWT signature and claim validation,Implemented (Demo),HTTP-AT-02 passed,Production issuer/JWKS not implemented,Security/IAM review
+Merchant identity sourced from verified JWT,Verified in CI,HTTP-AT-01 HTTP-AT-04 passed,Merchant lifecycle registry missing,Product/IAM
+Payment create/read scope policies,Verified in CI,HTTP-AT-03 HTTP-AT-04 passed,No external OAuth2 client provisioning,Security review
+Refund create/read scope policies,Verified in CI,HTTP-AT-03 HTTP-AT-05 passed,High-value four-eyes approval not implemented,Finance/Security
+PSP HMAC vs merchant JWT separation,Verified in CI,HTTP-AT-06 passed,Real provider signatures unknown,PSP contract
+Production OIDC/JWKS,Not Implemented,Not Run,Local HS256 key is development-only,Choose external issuer
+Identity Tracker v0.6,Updated,38 tests passed,11 security approval gates remain open,https://docs.google.com/spreadsheets/d/1h6KVganNNwQRahJR6ZTwI0HemtXZ1-hr/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
