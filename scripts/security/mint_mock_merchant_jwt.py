@@ -15,7 +15,7 @@ import uuid
 
 ISS = "https://merchant-auth.local.test"
 AUD = "paymentgateway.mock.api"
-SCOPES = {"payments:create", "payments:read", "refunds:create", "refunds:read"}
+SCOPES = {"payments:create", "payments:read", "refunds:create", "refunds:read", "refunds:approve"}
 
 def b64(raw: bytes) -> str:
     return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
@@ -25,11 +25,21 @@ def main() -> None:
     parser.add_argument("--merchant", required=True, help="Synthetic merchant UUID")
     parser.add_argument("--scopes", default="payments:create payments:read",
                         help="Space-delimited demo scopes")
+    parser.add_argument("--actor-subject", default=None,
+                        help="Synthetic staff subject; must match IAM registry; Development only")
+    parser.add_argument("--client-id", default="local-demo-client",
+                        help="Synthetic registered client id")
     parser.add_argument("--lifetime", type=int, default=600,
                         help="Token lifetime seconds (30–900)")
     a = parser.parse_args()
     merchant = str(uuid.UUID(a.merchant))
     scopes = a.scopes.split()
+    subject = a.actor_subject or ("merchant-" + uuid.UUID(merchant).hex)
+    for label, value in [("actor-subject", subject), ("client-id", a.client_id)]:
+        if not 1 <= len(value) <= 128 or any(
+            not (c.isalnum() or c in "-_.") for c in value
+        ):
+            parser.error(f"Invalid {label}: use simple local synthetic identifiers")
     if not scopes or any(s not in SCOPES for s in scopes):
         parser.error("Unsupported local demo scope")
     if not 30 <= a.lifetime <= 900:
@@ -39,9 +49,9 @@ def main() -> None:
         parser.error("Set MERCHANT_DEV_JWT_KEY (32+ UTF-8 bytes) in local environment")
     now = int(time.time())
     header = {"alg": "HS256", "typ": "JWT"}
-    payload = {"iss": ISS, "aud": AUD, "sub": "merchant-" + uuid.UUID(merchant).hex,
+    payload = {"iss": ISS, "aud": AUD, "sub": subject,
                "merchant_id": merchant, "scope": " ".join(scopes),
-               "client_id": "local-demo-client",
+               "client_id": a.client_id,
                "iat": now, "nbf": now, "exp": now + a.lifetime,
                "jti": str(uuid.uuid4())}
     data = b64(json.dumps(header, separators=(",", ":")).encode()) + "." + \

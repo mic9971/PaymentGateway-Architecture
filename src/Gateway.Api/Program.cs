@@ -19,6 +19,7 @@ builder.Services.AddScoped<IPaymentStore, NpgsqlPaymentStore>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IRefundStore, NpgsqlRefundStore>();
 builder.Services.AddScoped<RefundService>();
+builder.Services.AddScoped<NpgsqlRefundApprovalStore>();
 builder.Services.AddScoped<NpgsqlMockWebhookProcessor>();
 var webhookSecret = builder.Configuration["MockPsp:WebhookSecret"]
     ?? throw new InvalidOperationException("Development-only MockPsp:WebhookSecret is required.");
@@ -121,7 +122,9 @@ app.MapPost("/v1/payments/{paymentId:guid}/refunds", async (
     try
     {
         var created = await service.RequestAsync(
-            new RequestRefundCommand(merchantId,paymentId,key,request.AmountMinor),ct);
+            new RequestRefundCommand(merchantId,paymentId,key,request.AmountMinor,
+                http.User.FindFirst("sub")?.Value,
+                http.User.FindFirst("client_id")?.Value),ct);
         var r=created.Refund;
         return Results.Json(new RefundResponse(r.RefundId,r.PaymentId,r.AmountMinor,
             r.Currency,r.State.ToString(),created.Replayed),
@@ -132,6 +135,31 @@ app.MapPost("/v1/payments/{paymentId:guid}/refunds", async (
     catch (PaymentNotRefundableException e) { return Results.Conflict(new {error=e.Message}); }
     catch (ArgumentException e) { return Results.BadRequest(new {error=e.Message}); }
 }).RequireAuthorization("refunds:create");
+// Protected under an IAM registry policy; two *different* workforce subjects
+// are required. Merchant-controlled request bodies cannot choose approvers.
+app.MapPost("/v1/refunds/{refundId:guid}/approvals", async (
+    HttpContext http, Guid refundId, NpgsqlRefundApprovalStore approvals,
+    CancellationToken ct) =>
+{
+    if (!MerchantJwtAuthentication.TryGetMerchantId(http.User,out var merchant))
+        return Results.Forbid();
+    var actor=http.User.FindFirst("sub")?.Value ?? "";
+    var client=http.User.FindFirst("client_id")?.Value ?? "";
+    var issuer=http.User.FindFirst("iss")?.Value ?? "";
+    var outcome=await approvals.ApproveAsync(merchant,refundId,issuer,actor,client,ct);
+    return outcome switch
+    {
+        RefundApprovalOutcome.NotFound => Results.NotFound(),
+        RefundApprovalOutcome.Unauthorized => Results.Forbid(),
+        RefundApprovalOutcome.NotPending => Results.Conflict(new {error="Refund is not awaiting approval."}),
+        RefundApprovalOutcome.SelfApprovalForbidden => Results.Conflict(new {error="Requester cannot approve own refund."}),
+        RefundApprovalOutcome.AlreadyApproved => Results.Conflict(new {error="Actor has already approved this refund."}),
+        RefundApprovalOutcome.FirstApprovalRecorded => Results.Accepted(value:new {status="AwaitingSecondApprover"}),
+        RefundApprovalOutcome.ReleasedForProcessing => Results.Ok(new {status="ReleasedForProcessing"}),
+        _ => Results.StatusCode(500)
+    };
+}).RequireAuthorization("refunds:approve");
+
 app.MapGet("/v1/refunds/{refundId:guid}", async (
     HttpContext http, Guid refundId, RefundService service, CancellationToken ct) =>
 {

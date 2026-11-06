@@ -38,14 +38,17 @@ public sealed class NpgsqlRefundStore(NpgsqlDataSource dataSource) : IRefundStor
         if (paymentState != "Succeeded" || currency != "VND")
             throw new PaymentNotRefundableException();
 
+        var approvalRequired = command.AmountMinor >= RefundService.CandidateApprovalThresholdVndMinor;
+        var initialState = approvalRequired ? "PendingApproval" : "Requested";
         var refundId = Guid.NewGuid();
         var providerKey = "demo-refund-" + refundId.ToString("N");
         await using var claim = new NpgsqlCommand("""
             INSERT INTO refund.refund_requests
               (refund_id,payment_id,merchant_id,amount_minor,currency,
-               idempotency_key,request_hash,provider_operation_key,state)
+               idempotency_key,request_hash,provider_operation_key,state,
+               approval_required,request_actor_subject,request_actor_client)
             VALUES (@refund,@payment,@merchant,@amount,@currency,
-                    @key,@hash,@provider,'Requested')
+                    @key,@hash,@provider,@initial_state,@approval,@subject,@client)
             ON CONFLICT (merchant_id,idempotency_key) DO NOTHING
             RETURNING refund_id
             """, conn, tx);
@@ -57,6 +60,10 @@ public sealed class NpgsqlRefundStore(NpgsqlDataSource dataSource) : IRefundStor
         claim.Parameters.AddWithValue("key", command.IdempotencyKey);
         claim.Parameters.AddWithValue("hash", NpgsqlDbType.Bytea, fingerprint);
         claim.Parameters.AddWithValue("provider", providerKey);
+        claim.Parameters.AddWithValue("initial_state", initialState);
+        claim.Parameters.AddWithValue("approval", approvalRequired);
+        claim.Parameters.AddWithValue("subject", (object?)command.InitiatorSubject ?? DBNull.Value);
+        claim.Parameters.AddWithValue("client", (object?)command.InitiatorClient ?? DBNull.Value);
         var inserted = await claim.ExecuteScalarAsync(ct);
         if (inserted is null or DBNull)
         {
@@ -108,9 +115,14 @@ public sealed class NpgsqlRefundStore(NpgsqlDataSource dataSource) : IRefundStor
                 throw new InsufficientRefundBudgetException();
         }
 
-        await RefundOutbox.AppendAsync(conn, tx, "RefundRequested", refundId,
+        await RefundFinancialAudit.AppendAsync(conn, tx, refundId, command.PaymentId,
+            command.AuthenticatedMerchantId, command.InitiatorSubject, command.InitiatorClient,
+            approvalRequired ? "RefundPendingApproval" : "RefundRequested",
+            command.AmountMinor, ct);
+        await RefundOutbox.AppendAsync(conn, tx,
+            approvalRequired ? "RefundPendingApproval" : "RefundRequested", refundId,
             new { refund_id = refundId, payment_id = command.PaymentId,
-                simulated = true }, ct);
+                approval_required = approvalRequired, simulated = true }, ct);
         await tx.CommitAsync(ct);
         var snapshot = await GetAsync(command.AuthenticatedMerchantId, refundId, ct)
             ?? throw new InvalidOperationException("Committed refund missing.");

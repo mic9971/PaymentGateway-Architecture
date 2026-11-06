@@ -52,3 +52,12 @@ Deny unregistered merchant even with valid JWT,Verified in CI,IAM-T09 passed,Reg
 HTTP access audit,Implemented Best Effort,IAM-T10 passed,Not financial immutable audit,Compliance design
 Opt-in OIDC JWKS validation,Proposed,Not Run,No live IdP or key rotation,Identity Provider decision
 Security tracker v0.7,Updated,42 tests passed,Production identity/financial gates open,https://docs.google.com/spreadsheets/d/13JwYvpAZ4uXQlO6usEmFBFJj44VcyEZw/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
+
+Refund high-value PendingApproval gate,Implemented Mock,FIN-T01 FIN-T06 passed,Threshold unapproved,Finance review
+Requester/approver separation,Verified Mock CI,FIN-T02 passed,No real workforce identity,Security review
+Two distinct registered approvals,Verified Mock CI,FIN-T01 FIN-T04 FIN-T06 passed,Production IdP not integrated,IAM review
+Live IAM grant inside approval transaction,Verified Mock CI,FIN-T03 passed,Registry failure tests open,SRE review
+Atomic approval and outbox release,Verified Mock CI,FIN-T01 FIN-T04 passed,No real PSP refund,PSP review
+Financial event journal,Implemented Mock,FIN-T05 passed,PG trigger not immutable WORM,Compliance review
+Refund reject expire cancel workflow,Not Implemented,Not Run,Reservation release process missing,Finance design
+Finance Tracker v0.8,Updated,48 mock tests passed,6 finance gates open,https://docs.google.com/spreadsheets/d/1u7eFVa66-kn3-K12r_Ht7E0yBXkHsLds/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true

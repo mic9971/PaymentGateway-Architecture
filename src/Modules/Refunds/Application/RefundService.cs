@@ -7,7 +7,8 @@ using PaymentGateway.Refunds.Domain;
 namespace PaymentGateway.Refunds.Application;
 
 public sealed record RequestRefundCommand(
-    Guid AuthenticatedMerchantId, Guid PaymentId, string IdempotencyKey, long AmountMinor);
+    Guid AuthenticatedMerchantId, Guid PaymentId, string IdempotencyKey, long AmountMinor,
+    string? InitiatorSubject = null, string? InitiatorClient = null);
 
 public sealed record RefundCreationResult(RefundSnapshot Refund, bool Replayed);
 
@@ -24,6 +25,8 @@ public interface IRefundStore
 
 public sealed class RefundService(IRefundStore store)
 {
+    // EXAMPLE ONLY. Finance must approve real currency-dependent policies.
+    public const long CandidateApprovalThresholdVndMinor = 1_000_000;
     public async Task<RefundCreationResult> RequestAsync(RequestRefundCommand command, CancellationToken ct)
     {
         if (command.AuthenticatedMerchantId == Guid.Empty || command.PaymentId == Guid.Empty)
@@ -34,6 +37,12 @@ public sealed class RefundService(IRefundStore store)
             || command.IdempotencyKey.Length is < 8 or > 128
             || !command.IdempotencyKey.All(x=>char.IsAsciiLetterOrDigit(x) || x is '-' or '_' or '.'))
             throw new ArgumentException("Invalid Idempotency-Key.");
+        if (command.AmountMinor >= CandidateApprovalThresholdVndMinor &&
+            (string.IsNullOrWhiteSpace(command.InitiatorSubject)
+             || string.IsNullOrWhiteSpace(command.InitiatorClient)
+             || command.InitiatorSubject.Length > 256
+             || command.InitiatorClient.Length > 256))
+            throw new ArgumentException("High-value refund requires verified requester identity.");
         var canonical = JsonSerializer.Serialize(new[]{
             command.PaymentId.ToString("D"),
             command.AmountMinor.ToString(CultureInfo.InvariantCulture)

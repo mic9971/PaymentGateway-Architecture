@@ -122,3 +122,12 @@ Avoid production secrets and customer payment data in this repository.
 - Live registry grants are checked alongside JWT claims; merchant suspension takes effect before JWT expiration. Local SQL fixtures only — no real OIDC connection.
 - HTTP audit is **best effort**, not tamper-proof financial proof. The API remains MOCK-only and Development-locked.
 - `feature/merchant-security-hardening` → `feature/merchant-identity-authorization`. **Draft only; do not merge**.
+
+## Financial Authorization & Audit v0.8 (Draft PR #9)
+
+- [Four-Eyes Refund Approval design, failure boundaries and local runbook](docs/17-financial-authorization-audit/README.md).
+- [ADR-0023 — Two-person approval and financial evidence (Proposed)](docs/04-solution-proposal/adrs/ADR-0023-financial-dual-authorization-audit.md).
+- [Implementation Tracker v0.8 — **45-sheet Excel**](https://docs.google.com/spreadsheets/d/1u7eFVa66-kn3-K12r_Ht7E0yBXkHsLds/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true), prior 39 tabs preserved and six added.
+- [CI **48/48 passed**: 3 unit + 45 PostgreSQL/RabbitMQ/HTTP integration](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42174980522).
+- High-value demo refunds (illustrative threshold 1,000,000 VND) are reserved in `PendingApproval` until two distinct signed subjects approve. This is **not** proof of two independent humans; the audit trigger is **not** production immutable evidence.
+- `feature/refund-dual-approval-audit` targets Draft PR #8. **Do not merge** without approval.

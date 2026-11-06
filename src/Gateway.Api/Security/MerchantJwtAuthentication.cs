@@ -91,7 +91,7 @@ public static class MerchantJwtAuthentication
                 .RequireAuthenticatedUser()
                 .AddRequirements(new MerchantOperationRequirement("__deny_unclassified__"))
                 .Build();
-            foreach(var op in new[]{"payments:create","payments:read","refunds:create","refunds:read"})
+            foreach(var op in new[]{"payments:create","payments:read","refunds:create","refunds:read","refunds:approve"})
                 options.AddPolicy(op,policy=>policy.RequireAuthenticatedUser()
                     .AddRequirements(new MerchantOperationRequirement(op)));
         });
