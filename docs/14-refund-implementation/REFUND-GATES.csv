@@ -1,0 +1,11 @@
+ID,Gate,Owner,Status,Evidence
+G-RF-01,Refundable entitlement from capture/settlement,Finance/PSP,Needs Confirmation,Partner contract and signed rules
+G-RF-02,RefundBudget authority option A/B,Architecture/Finance,Proposed,ADR-0013 ADR-0020
+G-RF-03,Merchant refund authorization and permissions,Security,Not Run,AuthN/AuthZ tests
+G-RF-04,Concurrent over-refund test,QA,Passed,RF-T01 CI
+G-RF-05,Refund idempotency and retention,PSP Lead,Needs Confirmation,PSP sandbox and contract
+G-RF-06,Unknown release and manual escalation,Finance/Ops,Needs Confirmation,Operational workflow
+G-RF-07,Provider refund status inquiry,PSP Lead,Needs Confirmation,PSP partner evidence
+G-RF-08,Refund event contract and downstream compatibility,Architect,Proposed,Contract tests
+G-RF-09,Concurrency under DB failover/restore,SRE,Not Run,Game-day runbook
+G-RF-10,Refund financial reconciliation / accounting,Finance,Not Run,Provider statement evidence

@@ -1,6 +1,8 @@
 using Npgsql;
 using PaymentGateway.Payments.Application;
 using PaymentGateway.Payments.Infrastructure;
+using PaymentGateway.Refunds.Application;
+using PaymentGateway.Refunds.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,8 @@ var connectionString = builder.Configuration.GetConnectionString("Payments")
 builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
 builder.Services.AddScoped<IPaymentStore, NpgsqlPaymentStore>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<IRefundStore, NpgsqlRefundStore>();
+builder.Services.AddScoped<RefundService>();
 builder.Services.AddScoped<NpgsqlMockWebhookProcessor>();
 var webhookSecret = builder.Configuration["MockPsp:WebhookSecret"]
     ?? throw new InvalidOperationException("Development-only MockPsp:WebhookSecret is required.");
@@ -103,6 +107,39 @@ app.MapPost("/v1/providers/mock/webhook", async (
     };
 });
 
+
+app.MapPost("/v1/payments/{paymentId:guid}/refunds", async (
+    HttpContext http, Guid paymentId, CreateRefundRequest request,
+    RefundService service, CancellationToken ct) =>
+{
+    if (!TryGetLocalDemoMerchant(http, out var merchantId))
+        return Results.Unauthorized();
+    var key = http.Request.Headers["Idempotency-Key"].ToString();
+    try
+    {
+        var created = await service.RequestAsync(
+            new RequestRefundCommand(merchantId,paymentId,key,request.AmountMinor),ct);
+        var r=created.Refund;
+        return Results.Json(new RefundResponse(r.RefundId,r.PaymentId,r.AmountMinor,
+            r.Currency,r.State.ToString(),created.Replayed),
+            statusCode:created.Replayed?StatusCodes.Status200OK:StatusCodes.Status202Accepted);
+    }
+    catch (InsufficientRefundBudgetException e) { return Results.Conflict(new {error=e.Message}); }
+    catch (RefundConflictException e) { return Results.Conflict(new {error=e.Message}); }
+    catch (PaymentNotRefundableException e) { return Results.Conflict(new {error=e.Message}); }
+    catch (ArgumentException e) { return Results.BadRequest(new {error=e.Message}); }
+});
+app.MapGet("/v1/refunds/{refundId:guid}", async (
+    HttpContext http, Guid refundId, RefundService service, CancellationToken ct) =>
+{
+    if (!TryGetLocalDemoMerchant(http, out var merchantId))
+        return Results.Unauthorized();
+    var r=await service.GetAsync(merchantId,refundId,ct);
+    return r is null?Results.NotFound()
+        :Results.Ok(new RefundResponse(r.RefundId,r.PaymentId,r.AmountMinor,
+            r.Currency,r.State.ToString(),false));
+});
+
 app.Run();
 
 static bool TryGetLocalDemoMerchant(HttpContext http, out Guid merchantId)
@@ -119,3 +156,6 @@ public sealed record PaymentResponse(
 
 
 public sealed record MockWebhookSecret(byte[] Value);
+
+public sealed record CreateRefundRequest(long AmountMinor);
+public sealed record RefundResponse(Guid RefundId,Guid PaymentId,long AmountMinor,string Currency,string Status,bool Replayed);

@@ -94,3 +94,12 @@ Avoid production secrets and customer payment data in this repository.
 - [Verified GitHub Actions CI: 25/25 tests](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42054657420) — 3 unit + 22 PostgreSQL/RabbitMQ integration tests.
 - **Development-only Mock PSP HMAC**; no real provider key, production merchant authentication, bank statements, or funds movement.
 - Branch `feature/psp-webhook-reconciliation` is based on recovery Draft PR #4. No merge to any parent branch, `develop` or `main` without explicit approval.
+
+## Refund Domain & Concurrent Refund v0.5 (Draft PR #6)
+
+- [Refund implementation, model, invariant and local runbook](docs/14-refund-implementation/README.md).
+- [Proposed ADR-0020 — RefundBudget experiment](docs/04-solution-proposal/adrs/ADR-0020-refund-budget-mock.md), refining still-open [ADR-0013](docs/04-solution-proposal/adrs/ADR-0013-refund-boundary-and-reservation.md).
+- [Implementation Tracker v0.5 — 27 Excel sheets](https://docs.google.com/spreadsheets/d/1-bvaLzSISmrZNTg27gQIVRS4us8xEYxo/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true), previous 21 tabs retained + 6 new Refund tabs.
+- [Verified CI 32/32 — 3 unit + 29 PostgreSQL/RabbitMQ integration tests](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42153098364).
+- Only `MOCK` Refunds; RefundBudget is locally transactional with concurrent guard. No bank refund and no real financial/settlement entitlement proof.
+- `feature/refund-budget-concurrency` → `feature/psp-webhook-reconciliation` (Draft PR #5). **No merges** without explicit approval.

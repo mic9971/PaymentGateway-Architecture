@@ -12,10 +12,11 @@ public static class PaymentEventTopology
 
     public static string Route(string eventType)
     {
-        if (!eventType.StartsWith("Payment", StringComparison.Ordinal)
-            || eventType.Length <= "Payment".Length)
+        var family = eventType.StartsWith("Payment", StringComparison.Ordinal)?"Payment":
+            eventType.StartsWith("Refund",StringComparison.Ordinal)?"Refund":null;
+        if (family is null || eventType.Length <= family.Length)
             throw new ArgumentException("Unknown event type", nameof(eventType));
-        return "payment." + eventType["Payment".Length..].ToLowerInvariant();
+        return family.ToLowerInvariant() + "." + eventType[family.Length..].ToLowerInvariant();
     }
 
     public static async Task DeclareAsync(IChannel channel, CancellationToken ct)
@@ -46,6 +47,8 @@ public static class PaymentEventTopology
         await channel.QueueBindAsync(
             queue: AuditQueue, exchange: Exchange,
             routingKey: "payment.*", cancellationToken: ct);
+        await channel.QueueBindAsync(queue: AuditQueue, exchange: Exchange,
+            routingKey: "refund.*", cancellationToken: ct);
     }
 
     public static async Task<IConnection> ConnectAsync(string uri, CancellationToken ct)

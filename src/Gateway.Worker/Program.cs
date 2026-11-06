@@ -1,5 +1,6 @@
 using Npgsql;
 using PaymentGateway.Payments.Infrastructure;
+using PaymentGateway.Refunds.Infrastructure;
 using PaymentGateway.Worker;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -14,11 +15,15 @@ builder.Services.AddSingleton<NpgsqlUnknownRecoveryStore>();
 builder.Services.AddSingleton<NpgsqlMockPspLedger>();
 builder.Services.AddSingleton<PaymentRecoveryService>();
 builder.Services.AddSingleton<NpgsqlMockReconciliationStore>();
+builder.Services.AddSingleton<NpgsqlRefundProcessing>();
+builder.Services.AddSingleton<NpgsqlMockRefundProvider>();
+builder.Services.AddSingleton<NpgsqlRefundRecovery>();
 
 // Only DB-polling attempt worker may invoke Mock PSP CreatePayment.
 // The RabbitMQ consumer remains a non-financial audit projection.
 builder.Services.AddHostedService<PaymentProcessingWorker>();
 builder.Services.AddHostedService<PaymentRecoveryWorker>();
+builder.Services.AddHostedService<RefundWorker>();
 builder.Services.AddHostedService<MockReconciliationWorker>();
 builder.Services.AddHostedService<OutboxPublisherHostedService>();
 builder.Services.AddHostedService<AuditProjectionConsumerHostedService>();

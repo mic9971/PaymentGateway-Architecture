@@ -30,3 +30,10 @@ Terminal state conflict handling,Implemented (Demo),WH-T04 passed,No Finance inv
 Webhook amount and operation correlation,Implemented (Demo),WH-T05 passed,PSP merchant-account binding unapproved,Security/PSP review
 Reconciliation mismatch ledger,Implemented (Demo),WH-T06 passed,Mock provider same PostgreSQL host; no real statements,Finance validation
 Webhook tracker v0.4,Updated,25 automated tests passed,HTTP route + real PSP sandbox Not Run,https://docs.google.com/spreadsheets/d/1-KWKpiXq7nJyy0ItsacSh-tJRvRXy8OE/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true
+
+Refund atomic reservation,Implemented (Demo),RF-T01 passed,ADR-0013 Option A not accepted,Finance review
+Refund idempotency and merchant scope,Verified in CI,RF-T02 RF-T03 passed,Real merchant AuthN not implemented,Security review
+Mock refund worker and status inquiry,Verified in CI,RF-T04 RF-T05 RF-T06 RF-T07 passed,No real PSP refund contract,PSP sandbox
+Refund unknown reservation guard,Verified in CI,RF-T05 RF-T06 passed,Manual escalation incomplete,Finance Ops runbook
+Refund integration events and audit projection,Implemented (Demo),Mock outbox code,Contract and fault tests not complete,Messaging ADR
+Refund Tracker v0.5,Updated,32 automated tests passed,10 refund review gates remain open,https://docs.google.com/spreadsheets/d/1-bvaLzSISmrZNTg27gQIVRS4us8xEYxo/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true

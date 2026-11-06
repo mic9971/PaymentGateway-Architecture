@@ -14,7 +14,8 @@ public sealed class InboxProjectionStore(NpgsqlDataSource dataSource)
         string consumerName, Guid eventId, string eventType, byte[] body, CancellationToken ct)
     {
         if (eventId == Guid.Empty || string.IsNullOrWhiteSpace(consumerName)
-            || !eventType.StartsWith("Payment", StringComparison.Ordinal)
+            || !(eventType.StartsWith("Payment", StringComparison.Ordinal) ||
+                 eventType.StartsWith("Refund", StringComparison.Ordinal))
             || body.Length is <= 0 or > 65536)
             throw new ArgumentException("Malformed internal event metadata or size.");
         using var verifiedPayload = JsonDocument.Parse(body); // reject invalid JSON before insert
