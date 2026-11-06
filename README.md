@@ -103,3 +103,12 @@ Avoid production secrets and customer payment data in this repository.
 - [Verified CI 32/32 — 3 unit + 29 PostgreSQL/RabbitMQ integration tests](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42153098364).
 - Only `MOCK` Refunds; RefundBudget is locally transactional with concurrent guard. No bank refund and no real financial/settlement entitlement proof.
 - `feature/refund-budget-concurrency` → `feature/psp-webhook-reconciliation` (Draft PR #5). **No merges** without explicit approval.
+
+## Merchant Identity & Authorization v0.6 (Draft PR #7)
+
+- [Merchant JWT Authentication & Authorization Design + Local Runbook](docs/15-merchant-auth/README.md).
+- [ADR-0021 — Merchant identity boundary (Proposed)](docs/04-solution-proposal/adrs/ADR-0021-merchant-identity-authorization.md).
+- [Implementation Tracker v0.6 — 33 Excel sheets](https://docs.google.com/spreadsheets/d/1h6KVganNNwQRahJR6ZTwI0HemtXZ1-hr/edit?usp=drivesdk&ouid=116017105754217906634&rtpof=true&sd=true), preserving previous 27 tabs.
+- [GitHub Actions verified 38/38 tests: 3 unit + 35 integration](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42158393241).
+- Signed, expiring JWT with `merchant_id` and payment/refund scopes replaces spoofable `X-Demo-Merchant-Id`. Real OIDC/JWKS and merchant onboarding remain **Not Implemented**.
+- Branch `feature/merchant-identity-authorization` targets `feature/refund-budget-concurrency`. **Draft review only; do not merge**.
