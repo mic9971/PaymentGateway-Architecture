@@ -35,3 +35,7 @@ Refund reads \`Payment.Succeeded\` and remaining amount once, then sends PSP req
 ## Decision / implementation gate
 
 **Not accepted.** Finance/PSP/Product/Architect review, then write concurrency integration test and PSP crash/timeout/resume tests before implementing migration or external refund. Recorded on DDD Decision Gate G-DDD-05, G-DDD-14.
+
+## Development experiment update — v0.5
+
+[Refund Domain & Budget demo](../../14-refund-implementation/README.md) now implements **Option A experimentally**: Refund-owned atomic budget in one PostgreSQL deployment, using Payment row locking for eligibility, a conditional reservation update and a refund Outbox. [CI 32/32](https://github.com/mic9971/PaymentGateway-Architecture/actions/runs/42153098364) includes concurrency and Unknown refund tests. This is **not** an acceptance of ADR-0013, and it does not establish actual bank refundable entitlement, PSP idempotency or multi-party settlement correctness. See [ADR-0020](./ADR-0020-refund-budget-mock.md) for the unapproved experimental trade-off.
