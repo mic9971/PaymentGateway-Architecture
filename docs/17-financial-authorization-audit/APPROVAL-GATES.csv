@@ -1,0 +1,13 @@
+ID,Control or Decision,Owner,Status,Evidence
+FA-G01,Illustrative 1000000-VND threshold,Finance,Proposed,ADR-0023
+FA-G02,PendingApproval blocks Mock PSP Worker,QA,Passed Mock CI,FIN-T01
+FA-G03,Requester cannot approve own refund,QA Security,Passed Mock CI,FIN-T02
+FA-G04,Two distinct actors and duplicate approval dedup,QA,Passed Mock CI,FIN-T01 FIN-T04
+FA-G05,Live IAM grants revalidated in approval TX,Security,Passed Mock CI,FIN-T03
+FA-G06,HTTP approval route authorization,Security,Passed Mock CI,FIN-T06
+FA-G07,Transactional refund action journal,Architecture QA,Passed Mock CI,FIN-T01 FIN-T05
+FA-G08,Independent real workforce identity and MFA,IAM Security,Not Run,External IdP / MFA
+FA-G09,Refund rejection and approval expiry lifecycle,Finance Product,Not Implemented,Review workflow
+FA-G10,Immutable external financial audit / WORM,Compliance,Not Implemented,Regulated audit decision
+FA-G11,PSP real refund and settlement reconciliation,PSP Finance,Not Run,Sandbox + statement
+FA-G12,HA recovery and approval race with suspension,SRE QA,Not Run,Game-day evidence
