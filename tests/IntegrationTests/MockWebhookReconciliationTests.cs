@@ -24,7 +24,7 @@ public sealed class MockWebhookReconciliationTests
         Assert.True(MockWebhookSignature.Verify(Secret, timestamp, signature, raw, now));
         Assert.False(MockWebhookSignature.Verify(Secret, timestamp, signature,
             Encoding.UTF8.GetBytes("""{"event_id":"demo","status":"Failed"}"""), now));
-        Assert.False(MockWebhookSignature.Verify(Secret, timestamp, signature[..^1] + "0", raw, now));
+        Assert.False(MockWebhookSignature.Verify(Secret, timestamp, signature[..^1] + (signature[^1] == '0' ? "1" : "0"), raw, now));
         Assert.False(MockWebhookSignature.Verify(Secret, timestamp, "sha256=not-a-signature", raw, now));
         Assert.False(MockWebhookSignature.Verify(Secret, timestamp, signature, raw, now.AddMinutes(10)));
     }
