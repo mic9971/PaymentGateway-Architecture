@@ -9,5 +9,6 @@
     <ProjectReference Include="../Modules/Payments/Application/Payments.Application.csproj" />
     <ProjectReference Include="../Modules/Payments/Infrastructure/Payments.Infrastructure.csproj" />
     <ProjectReference Include="../BuildingBlocks/Messaging/Messaging.csproj" />
+    <ProjectReference Include="../Modules/Refunds/Infrastructure/Refund.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,9 @@
   <Project Path="src/Modules/Payments/Application/Payments.Application.csproj" />
   <Project Path="src/Modules/Payments/Infrastructure/Payments.Infrastructure.csproj" />
   <Project Path="src/BuildingBlocks/Messaging/Messaging.csproj" />
+  <Project Path="src/Modules/Refunds/Domain/Refund.Domain.csproj" />
+  <Project Path="src/Modules/Refunds/Application/Refund.Application.csproj" />
+  <Project Path="src/Modules/Refunds/Infrastructure/Refund.Infrastructure.csproj" />
   <Project Path="tests/UnitTests/Payment.Core.UnitTests.csproj" />
   <Project Path="tests/IntegrationTests/Payment.IntegrationTests.csproj" />
 </Solution>

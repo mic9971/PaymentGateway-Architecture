@@ -59,6 +59,7 @@ services:
       RabbitMq__Uri: "amqp://demo:${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in .env}@rabbitmq:5672/"
       # Succeeded | Failed | Timeout | TimeoutBeforeEffect | TimeoutAfterSuccess
       MockPsp__Outcome: "${MOCK_PSP_OUTCOME:-Succeeded}"
+      MockRefund__Outcome: "${MOCK_REFUND_OUTCOME:-Succeeded}"
     depends_on:
       postgres:
         condition: service_healthy

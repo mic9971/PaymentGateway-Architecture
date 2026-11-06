@@ -54,6 +54,11 @@ jobs:
           if [ -f deploy/compose/postgres-init/004_mock_webhooks_reconciliation.sql ]; then
             psql -h localhost -U payment_demo -d payment_demo -v ON_ERROR_STOP=1 -f deploy/compose/postgres-init/004_mock_webhooks_reconciliation.sql
           fi
+      - name: Apply refund schema when present
+        run: |
+          if [ -f deploy/compose/postgres-init/005_refund_budget.sql ]; then
+            psql -h localhost -U payment_demo -d payment_demo -v ON_ERROR_STOP=1 -f deploy/compose/postgres-init/005_refund_budget.sql
+          fi
       - name: Restore
         run: dotnet restore PaymentGateway.slnx
       - name: Build
