@@ -64,6 +64,11 @@ jobs:
           if [ -f deploy/compose/postgres-init/006_merchant_registry_audit.sql ]; then
             psql -h localhost -U payment_demo -d payment_demo -v ON_ERROR_STOP=1 -f deploy/compose/postgres-init/006_merchant_registry_audit.sql
           fi
+      - name: Apply refund approval and finance audit schema
+        run: |
+          if [ -f deploy/compose/postgres-init/007_refund_approvals_finance_audit.sql ]; then
+            psql -h localhost -U payment_demo -d payment_demo -v ON_ERROR_STOP=1 -f deploy/compose/postgres-init/007_refund_approvals_finance_audit.sql
+          fi
       - name: Restore
         run: dotnet restore PaymentGateway.slnx
       - name: Build

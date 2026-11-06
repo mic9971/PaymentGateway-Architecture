@@ -15,7 +15,7 @@ import uuid
 
 ISS = "https://merchant-auth.local.test"
 AUD = "paymentgateway.mock.api"
-SCOPES = {"payments:create", "payments:read", "refunds:create", "refunds:read"}
+SCOPES = {"payments:create", "payments:read", "refunds:create", "refunds:read", "refunds:approve"}
 
 def b64(raw: bytes) -> str:
     return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
