@@ -8,13 +8,21 @@ public sealed record ClaimedRefund(Guid RefundId,Guid PaymentId,Guid ClaimToken,
 /// <summary>DB coordinator only; provider calls happen after the claim transaction commits.</summary>
 public sealed class NpgsqlRefundProcessing(NpgsqlDataSource source)
 {
-    public async Task<ClaimedRefund?> ClaimOneAsync(CancellationToken ct)
+    public Task<ClaimedRefund?> ClaimOneAsync(CancellationToken ct)
+        => ClaimAsync(null, ct);
+
+    // Scoped claim for controlled integration tests and future operator investigation.
+    public Task<ClaimedRefund?> ClaimRefundAsync(Guid refundId,CancellationToken ct)
+        => ClaimAsync(refundId,ct);
+
+    private async Task<ClaimedRefund?> ClaimAsync(Guid? refundId,CancellationToken ct)
     {
         await using var conn=await source.OpenConnectionAsync(ct);
         await using var cmd=new NpgsqlCommand("""
             WITH candidate AS (
               SELECT refund_id FROM refund.refund_requests
-              WHERE state='Requested' ORDER BY created_at,refund_id
+              WHERE state='Requested' AND (@refund_filter IS NULL OR refund_id=@refund_filter)
+              ORDER BY created_at,refund_id
               LIMIT 1 FOR UPDATE SKIP LOCKED
             )
             UPDATE refund.refund_requests r
@@ -24,6 +32,7 @@ public sealed class NpgsqlRefundProcessing(NpgsqlDataSource source)
             """,conn);
         var token=Guid.NewGuid();
         cmd.Parameters.AddWithValue("token",token);
+        cmd.Parameters.AddWithValue("refund_filter",NpgsqlTypes.NpgsqlDbType.Uuid,(object?)refundId??DBNull.Value);
         await using var rd=await cmd.ExecuteReaderAsync(ct);
         if(!await rd.ReadAsync(ct)) return null;
         return new ClaimedRefund(rd.GetGuid(0),rd.GetGuid(1),token,rd.GetString(2));
