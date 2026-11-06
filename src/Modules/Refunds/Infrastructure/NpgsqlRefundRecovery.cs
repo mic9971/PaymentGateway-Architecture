@@ -53,7 +53,7 @@ public sealed class NpgsqlRefundRecovery(NpgsqlDataSource source,NpgsqlMockRefun
             RETURNING amount_minor
             """,conn,tx))
         {
-            update.Parameters.AddWithValue("state",verified.ToString());
+            update.Parameters.AddWithValue("state",verified.Value.ToString());
             update.Parameters.AddWithValue("refund",claimed.RefundId);
             update.Parameters.AddWithValue("payment",claimed.PaymentId);
             update.Parameters.AddWithValue("token",claimed.Token);
