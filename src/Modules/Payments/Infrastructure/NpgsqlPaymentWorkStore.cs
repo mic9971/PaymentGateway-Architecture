@@ -46,6 +46,8 @@ public sealed class NpgsqlPaymentWorkStore(NpgsqlDataSource dataSource)
         {
             if (!await reader.ReadAsync(ct))
             {
+                // Npgsql forbids committing while the DataReader is still active.
+                await reader.DisposeAsync();
                 await tx.CommitAsync(ct);
                 return null;
             }
