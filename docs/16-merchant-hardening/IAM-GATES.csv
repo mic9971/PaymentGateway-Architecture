@@ -1,0 +1,13 @@
+ID,Gate,Owner,Status,Evidence
+IAM-G01,Merchant registered and Active,Product/IAM,Implemented Demo,SQL registry and test
+IAM-G02,Client issuer/subject/client_id scoped binding,Security,Implemented Demo,Authorization handler
+IAM-G03,Live suspension on unexpired JWT,Security,CI Pending,IAM-T07
+IAM-G04,Database grant intersection and missing registry deny,Security,CI Pending,IAM-T08 IAM-T09
+IAM-G05,Best-effort HTTP access logging,Security/SRE,CI Pending,IAM-T10
+IAM-G06,External OIDC/JWKS issuer + key rotation,Security/IAM,Not Run,Real IdP sandbox
+IAM-G07,Merchant onboarding/KYC and lifecycle events,Product,Not Implemented,Registry management design
+IAM-G08,Refund dual control and spending limits,Finance,Not Implemented,Approval workflow
+IAM-G09,Immutable financial audit and retention,Compliance,Not Implemented,Accounting event proof
+IAM-G10,Registry load/failover and cache invalidation,SRE,Not Run,Performance/game day
+IAM-G11,JWT theft/incident revocation and abuse limits,Security,Not Implemented,Threat model
+IAM-G12,Remove Mock-only startup guard after all gates,Architecture Board,Not Approved,Go-live checklist
